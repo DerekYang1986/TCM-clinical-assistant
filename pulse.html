@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCM Clinical Assistant - Pulse Palpation</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .patient-summary { background: #f3f3f3; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+        .hand-heading { margin-top: 35px; }
+        .position-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px; }
+        .position-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+        .position-card h3 { margin-top: 0; }
+        label { display: block; margin: 10px 0; }
+        select, textarea { width: 100%; box-sizing: border-box; padding: 8px; margin-top: 5px; font: inherit; }
+        textarea { min-height: 75px; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; }
+        .navigation { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>TCM Clinical Assistant</h1>
+    <div class="patient-summary">
+        <h2>Patient Information</h2>
+        <p><strong>Patient:</strong> <span id="patientName"></span></p>
+        <p><strong>Age:</strong> <span id="patientAge"></span></p>
+        <p><strong>Sex:</strong> <span id="patientSex"></span></p>
+        <p><strong>Chief Complaint:</strong> <span id="patientComplaint"></span></p>
+    </div>
+
+    <h2>Pulse Palpation</h2>
+    <p>For each Cun, Guan, and Chi position, record the individual pulse findings.</p>
+
+    <div id="pulsePositions"></div>
+
+    <div class="navigation">
+        <button type="button" onclick="window.location.href='tongue.html'">← Back</button>
+        <button type="button" onclick="saveAndContinue()">Save and Continue →</button>
+    </div>
+
+    <script>
+        const patient = JSON.parse(localStorage.getItem("patient"));
+        if (patient) {
+            document.getElementById("patientName").textContent = patient.firstName;
+            document.getElementById("patientAge").textContent = patient.age;
+            document.getElementById("patientSex").textContent = patient.sex;
+            document.getElementById("patientComplaint").textContent = patient.chiefComplaint;
+        }
+
+        const positions = [
+            ["leftCun", "Left Hand — Cun"], ["leftGuan", "Left Hand — Guan"], ["leftChi", "Left Hand — Chi"],
+            ["rightCun", "Right Hand — Cun"], ["rightGuan", "Right Hand — Guan"], ["rightChi", "Right Hand — Chi"]
+        ];
+
+        const choices = {
+            level: ["", "Floating", "Middle", "Sinking", "Deep"],
+            strength: ["", "Forceful", "Moderate", "Weak", "Deficient"],
+            rate: ["", "Slow", "Normal", "Rapid", "Variable"],
+            rhythm: ["", "Regular", "Irregular", "Intermittent", "Knotted"],
+            shape: ["", "Wiry", "Slippery", "Thready", "Choppy", "Tight", "Soggy", "Full"]
+        };
+
+        function selectOptions(type) {
+            return choices[type].map(value =>
+                `<option value="${value}">${value || "Please select"}</option>`
+            ).join("");
+        }
+
+        function positionCard(id, title) {
+            return `
+                <div class="position-card">
+                    <h3>${title}</h3>
+                    <label>Pulse Level<select id="${id}Level">${selectOptions("level")}</select></label>
+                    <label>Pulse Strength<select id="${id}Strength">${selectOptions("strength")}</select></label>
+                    <label>Pulse Rate<select id="${id}Rate">${selectOptions("rate")}</select></label>
+                    <label>Pulse Rhythm<select id="${id}Rhythm">${selectOptions("rhythm")}</select></label>
+                    <label>Pulse Shape<select id="${id}Shape">${selectOptions("shape")}</select></label>
+                    <label>Notes<textarea id="${id}Notes" placeholder="Other findings at this position."></textarea></label>
+                </div>`;
+        }
+
+        const leftPositions = positions.slice(0, 3).map(([id, title]) => positionCard(id, title)).join("");
+        const rightPositions = positions.slice(3).map(([id, title]) => positionCard(id, title)).join("");
+        document.getElementById("pulsePositions").innerHTML = `
+            <h2 class="hand-heading">Left Hand</h2><div class="position-grid">${leftPositions}</div>
+            <h2 class="hand-heading">Right Hand</h2><div class="position-grid">${rightPositions}</div>`;
+
+        const savedPulsePalpation = JSON.parse(localStorage.getItem("pulsePalpation"));
+        if (savedPulsePalpation) {
+            positions.forEach(([id]) => {
+                const savedPosition = savedPulsePalpation.positions?.[id];
+                const values = typeof savedPosition === "object" && savedPosition !== null
+                    ? savedPosition
+                    : { notes: typeof savedPosition === "string" ? savedPosition : "" };
+                ["Level", "Strength", "Rate", "Rhythm", "Shape", "Notes"].forEach(field => {
+                    document.getElementById(`${id}${field}`).value = values[field.toLowerCase()] || "";
+                });
+            });
+        }
+
+        function saveAndContinue() {
+            const pulsePalpation = { positions: {} };
+            positions.forEach(([id]) => {
+                pulsePalpation.positions[id] = {
+                    level: document.getElementById(`${id}Level`).value,
+                    strength: document.getElementById(`${id}Strength`).value,
+                    rate: document.getElementById(`${id}Rate`).value,
+                    rhythm: document.getElementById(`${id}Rhythm`).value,
+                    shape: document.getElementById(`${id}Shape`).value,
+                    notes: document.getElementById(`${id}Notes`).value
+                };
+            });
+            localStorage.setItem("pulsePalpation", JSON.stringify(pulsePalpation));
+            window.location.href = "case-summary.html";
+        }
+    </script>
+</body>
+</html>

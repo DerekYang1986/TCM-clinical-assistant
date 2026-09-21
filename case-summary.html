@@ -1,0 +1,4311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>TCM Clinical Assistant - Case Summary</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+            background: #ffffff;
+            color: #222;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-top: 35px;
+            padding-bottom: 7px;
+            border-bottom: 2px solid #444;
+        }
+
+        h3 {
+            margin-top: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .summary-box {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            background: #fafafa;
+            font-size: 15px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .subsection {
+            margin-top: 22px;
+        }
+
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            margin-bottom: 18px;
+            background: white;
+        }
+
+        .field-table th,
+        .field-table td {
+            border: 1px solid #d6d6d6;
+            padding: 9px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .field-table th {
+            width: 30%;
+            font-weight: bold;
+            background: #f1f1f1;
+        }
+
+        .pulse-table th,
+        .pulse-table td {
+            border: 1px solid #d6d6d6;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .pulse-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 10px;
+        }
+
+        .pulse-table th {
+            background: #f1f1f1;
+        }
+
+        .notice {
+            margin-top: 15px;
+            color: #8a4b00;
+        }
+
+        .button-row {
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 10px 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .empty-message {
+            color: #777;
+            font-style: italic;
+        }
+
+        @media (max-width: 700px) {
+
+            .field-table th {
+                width: 40%;
+            }
+
+            .pulse-table {
+                font-size: 13px;
+            }
+
+            .pulse-table th,
+            .pulse-table td {
+                padding: 6px;
+            }
+
+        }
+
+    </style>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+</head>
+
+
+<body>
+
+    <h1>TCM Clinical Assistant</h1>
+
+    <h2>Case Summary</h2>
+
+    <p class="intro">
+        The information below has been organized according to the
+        clinical interview sequence. Please review it before sending
+        the case to ChatGPT for clinical reasoning.
+    </p>
+
+
+    <div id="caseSummary"
+         class="summary-box">
+
+        Loading case information...
+
+    </div>
+
+
+    <p id="dataNotice"
+       class="notice"></p>
+
+
+    <div class="button-row">
+
+        <button type="button"
+                onclick="copySummary()">
+
+            Copy Summary
+
+        </button>
+
+
+        <button type="button"
+                onclick="window.location.href='Clinical Assessment-Treatment.html'">
+
+            Clinical Assessment & Treatment →
+
+        </button>
+<button
+    type="button"
+    onclick="analyzeWithChatGPT()"
+>
+    Analyze with ChatGPT
+</button>
+
+        <button type="button"
+                onclick="window.location.href='pulse.html'">
+
+            ← Back to Pulse Palpation
+
+        </button>
+
+    </div>
+
+
+
+<script>
+
+
+/* =========================================================
+   BASIC DATA FUNCTIONS
+   ========================================================= */
+
+
+function getData(key) {
+
+    try {
+
+        const rawData =
+            localStorage.getItem(key);
+
+        if (!rawData) {
+            return null;
+        }
+
+        return JSON.parse(rawData);
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+
+function getFirstAvailableData(keys) {
+
+    for (const key of keys) {
+
+        const data =
+            getData(key);
+
+        if (
+            data !== null &&
+            data !== undefined
+        ) {
+
+            return data;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+/* =========================================================
+   EMPTY VALUE CHECK
+   ========================================================= */
+
+
+function isEmptyValue(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return true;
+
+    }
+
+
+    if (
+        value === "Not recorded" ||
+        value === "None recorded"
+    ) {
+
+        return true;
+
+    }
+
+
+    if (
+        Array.isArray(value) &&
+        value.length === 0
+    ) {
+
+        return true;
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =========================================================
+   FORMAT VALUE
+   ========================================================= */
+
+
+function formatValue(value) {
+
+    if (isEmptyValue(value)) {
+
+        return "";
+
+    }
+
+
+    if (Array.isArray(value)) {
+
+        return value
+            .filter(item => !isEmptyValue(item))
+            .join(", ");
+
+    }
+
+
+    return String(value);
+
+}
+
+
+/* =========================================================
+   FORMAT LABEL
+   ========================================================= */
+
+
+function formatLabel(key) {
+
+    return key
+        .replace(/([A-Z])/g, " $1")
+        .replace(/[_-]/g, " ")
+        .replace(/^./, character =>
+            character.toUpperCase()
+        );
+
+}
+
+
+/* =========================================================
+   CREATE TABLE
+   ========================================================= */
+
+
+function createTable(fields) {
+
+    const validFields =
+        fields.filter(item =>
+            !isEmptyValue(item.value)
+        );
+
+
+    if (validFields.length === 0) {
+
+        return null;
+
+    }
+
+
+    const table =
+        document.createElement("table");
+
+    table.className =
+        "field-table";
+
+
+    validFields.forEach(item => {
+
+        const row =
+            document.createElement("tr");
+
+
+        const label =
+            document.createElement("th");
+
+        label.textContent =
+            item.label;
+
+
+        const value =
+            document.createElement("td");
+
+        value.textContent =
+            formatValue(item.value);
+
+
+        row.appendChild(label);
+        row.appendChild(value);
+
+        table.appendChild(row);
+
+    });
+
+
+    return table;
+
+}
+
+
+/* =========================================================
+   ADD SUBSECTION
+   ========================================================= */
+
+
+function addSubsection(
+    container,
+    title,
+    fields
+) {
+
+    const table =
+        createTable(fields);
+
+
+    if (!table) {
+
+        return false;
+
+    }
+
+
+    const subsection =
+        document.createElement("div");
+
+    subsection.className =
+        "subsection";
+
+
+    const heading =
+        document.createElement("h3");
+
+    heading.textContent =
+        title;
+
+
+    subsection.appendChild(heading);
+
+    subsection.appendChild(table);
+
+    container.appendChild(subsection);
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   ADD SECTION
+   ========================================================= */
+
+
+function addSection(
+    container,
+    number,
+    title
+) {
+
+    const section =
+        document.createElement("div");
+
+    section.className =
+        "section";
+
+
+    const heading =
+        document.createElement("h2");
+
+    heading.textContent =
+        `${number}. ${title}`;
+
+
+    section.appendChild(heading);
+
+    container.appendChild(section);
+
+
+    return section;
+
+}
+
+
+/* =========================================================
+   PATIENT INFORMATION
+   ========================================================= */
+
+
+function buildPatientSection(container, patient) {
+
+    const section =
+        addSection(
+            container,
+            1,
+            "Patient Information"
+        );
+
+
+    if (!patient) {
+
+        return;
+
+    }
+
+
+    const fields = [
+
+        {
+            label: "First Name",
+            value: patient.firstName
+        },
+
+        {
+            label: "Last Initial",
+            value: patient.lastInitial
+        },
+
+        {
+            label: "Age",
+            value: patient.age
+        },
+
+        {
+            label: "Sex",
+            value: patient.sex
+        },
+
+        {
+            label: "Date",
+            value: patient.date
+        },
+
+
+    ];
+
+
+    const table =
+        createTable(fields);
+
+
+    if (table) {
+
+        section.appendChild(table);
+
+    }
+
+}
+
+
+/* =========================================================
+   CHIEF COMPLAINT
+   ========================================================= */
+
+
+function buildChiefComplaintSection(
+    container,
+    painAssessment
+) {
+
+    const section =
+        addSection(
+            container,
+            2,
+            "Chief Complaint"
+        );
+
+    const patient =
+        getData("patient");
+
+    if (!patient) {
+        return;
+    }
+
+    addSubsection(
+        section,
+        "Main Complaint",
+        [
+            {
+                label: "Chief Complaint",
+                value: patient.chiefComplaint
+            }
+        ]
+    );
+}
+
+
+/* =========================================================
+   HPI / OPQRST
+   ========================================================= */
+
+function buildHPISection(
+    container,
+    painAssessment
+) {
+
+    const section =
+        addSection(
+            container,
+            3,
+            "History of Present Illness / OPQRST"
+        );
+
+    if (!painAssessment) {
+        return;
+    }
+
+
+    /* =====================================================
+       O — ONSET
+       ===================================================== */
+
+    addSubsection(
+        section,
+        "O — Onset",
+        [
+            {
+                label: "Duration",
+                value:
+                    painAssessment.O &&
+                    painAssessment.O.duration
+            },
+
+            {
+                label: "Onset Type",
+                value:
+                    painAssessment.O &&
+                    painAssessment.O.onsetType
+            },
+
+            {
+                label: "Associated Cause / Trigger",
+                value:
+                    painAssessment.O &&
+                    painAssessment.O.associatedCause
+            }
+        ]
+    );
+
+
+    /* =====================================================
+       P — PROVOCATION / PALLIATION
+       ===================================================== */
+
+    addSubsection(
+        section,
+        "P — Provocation / Palliation",
+        [
+            {
+                label: "Worse With",
+                value:
+                    painAssessment.P &&
+                    painAssessment.P.worse
+            },
+
+            {
+                label: "Better With",
+                value:
+                    painAssessment.P &&
+                    painAssessment.P.better
+            }
+        ]
+    );
+
+
+    /* =====================================================
+       Q — QUALITY
+       ===================================================== */
+
+    addSubsection(
+        section,
+        "Q — Quality",
+        [
+            {
+                label: "Pain Quality",
+                value:
+                    painAssessment.Q &&
+                    painAssessment.Q.quality
+            },
+
+            {
+                label: "Other",
+                value:
+                    painAssessment.Q &&
+                    painAssessment.Q.other
+            }
+        ]
+    );
+
+
+    /* =====================================================
+       R — REGION / RADIATION
+       ===================================================== */
+
+    addSubsection(
+        section,
+        "R — Region / Radiation",
+        [
+            {
+                label: "Location",
+                value:
+                    painAssessment.R &&
+                    painAssessment.R.location
+            },
+
+            {
+                label: "Radiation",
+                value:
+                    painAssessment.R &&
+                    painAssessment.R.radiation
+            },
+
+            {
+                label: "Radiation Location",
+                value:
+                    painAssessment.R &&
+                    painAssessment.R.radiationLocation
+            }
+        ]
+    );
+
+
+    /* =====================================================
+       S — SEVERITY
+       ===================================================== */
+
+    const severity =
+        painAssessment.S;
+
+    if (
+        severity &&
+        (
+            !isEmptyValue(severity.current) ||
+            !isEmptyValue(severity.best) ||
+            !isEmptyValue(severity.worst)
+        )
+    ) {
+
+        const severityTable =
+            createTable([
+
+                {
+                    label: "Current",
+                    value:
+                        !isEmptyValue(severity.current)
+                            ? severity.current + "/10"
+                            : ""
+                },
+
+                {
+                    label: "Best",
+                    value:
+                        !isEmptyValue(severity.best)
+                            ? severity.best + "/10"
+                            : ""
+                },
+
+                {
+                    label: "Worst",
+                    value:
+                        !isEmptyValue(severity.worst)
+                            ? severity.worst + "/10"
+                            : ""
+                }
+
+            ]);
+
+        if (severityTable) {
+
+            addSubsection(
+                section,
+                "S — Severity",
+                []
+            );
+
+            section.appendChild(
+                severityTable
+            );
+        }
+    }
+
+
+    /* =====================================================
+       T — TIMING
+       ===================================================== */
+
+    addSubsection(
+        section,
+        "T — Timing",
+        [
+            {
+                label: "Pattern",
+                value:
+                    painAssessment.T &&
+                    painAssessment.T.pattern
+            },
+
+            {
+                label: "Episode Duration",
+                value:
+                    painAssessment.T &&
+                    painAssessment.T.episodeDuration
+            },
+
+            {
+                label: "Episode Frequency",
+                value:
+                    painAssessment.T &&
+                    painAssessment.T.episodeFrequency
+            },
+
+            {
+                label: "Worse Time",
+                value:
+                    painAssessment.T &&
+                    painAssessment.T.worseTime
+            },
+
+            {
+                label: "Development",
+                value:
+                    painAssessment.T &&
+                    painAssessment.T.development
+            }
+        ]
+    );
+}
+
+
+/* =========================================================
+   GENERAL INQUIRY
+   ========================================================= */
+
+
+function buildGeneralInquirySection(
+    container,
+    data
+) {
+
+    const section =
+        addSection(
+            container,
+            4,
+            "Associated Symptoms / General Inquiry"
+        );
+
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    /* ---------- Temperature ---------- */
+
+
+    addSubsection(
+        section,
+        "Temperature",
+        [
+
+            {
+                label: "Temperature Sensation",
+                value:
+                    data.chillsFever
+                        ?.temperatureSensation
+            },
+
+            {
+                label: "Cold Characteristics",
+                value:
+                    data.chillsFever
+                        ?.coldCharacteristics
+            },
+
+            {
+                label: "Hot Characteristics",
+                value:
+                    data.chillsFever
+                        ?.hotCharacteristics
+            },
+
+            {
+                label: "Fever",
+                value:
+                    data.chillsFever
+                        ?.feverStatus
+            },
+
+            {
+                label: "Highest Temperature",
+                value:
+                    data.chillsFever
+                        ?.highestTemperature
+            },
+
+            {
+                label: "Fever Timing",
+                value:
+                    data.chillsFever
+                        ?.feverTiming
+            },
+
+            {
+                label: "Associated Symptoms",
+                value:
+                    data.chillsFever
+                        ?.associatedSymptoms
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.chillsFever
+                        ?.notes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Sweating ---------- */
+
+
+    addSubsection(
+        section,
+        "Sweating",
+        [
+
+            {
+                label: "Ease of Sweating",
+                value:
+                    data.sweating
+                        ?.ease
+            },
+
+            {
+                label: "Timing",
+                value:
+                    data.sweating
+                        ?.timing
+            },
+
+            {
+                label: "Time",
+                value:
+                    data.sweating
+                        ?.spontaneousSweatingTime
+            },
+
+            {
+                label: "Amount",
+                value:
+                    data.sweating
+                        ?.amount
+            },
+
+            {
+                label: "Location",
+                value:
+                    data.sweating
+                        ?.locationType
+            },
+
+            {
+                label: "Specific Locations",
+                value:
+                    data.sweating
+                        ?.specificLocations
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.sweating
+                        ?.notes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Appetite ---------- */
+
+
+    addSubsection(
+        section,
+        "Appetite",
+        [
+
+            {
+                label: "Appetite",
+                value:
+                    data.appetite
+                        ?.level
+            },
+
+            {
+                label: "Meals per Day",
+                value:
+                    data.appetite
+                        ?.meals
+            },
+
+            {
+                label: "Typical Food",
+                value:
+                    data.appetite
+                        ?.typicalFood
+            },
+
+            {
+                label: "Food Cravings",
+                value:
+                    data.appetite
+                        ?.cravings
+            },
+
+            {
+                label: "Eating Habits",
+                value:
+                    data.appetite
+                        ?.habits
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.appetite
+                        ?.appetiteNotes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Thirst ---------- */
+
+
+    addSubsection(
+        section,
+        "Thirst",
+        [
+
+            {
+                label: "Thirst",
+                value:
+                    data.thirst
+                        ?.level
+            },
+
+            {
+                label: "Fluid Intake",
+                value:
+                    data.thirst
+                        ?.fluidIntake
+            },
+
+            {
+                label: "Drinking Preference",
+                value:
+                    data.thirst
+                        ?.drinkingPreference
+            },
+
+            {
+                label: "Characteristics",
+                value:
+                    data.thirst
+                        ?.characteristics
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.thirst
+                        ?.thirstNotes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Sleep ---------- */
+
+
+    addSubsection(
+        section,
+        "Sleep",
+        [
+
+            {
+                label: "Sleep Duration",
+                value:
+                    data.sleep
+                        ?.duration
+            },
+
+            {
+                label: "Difficulty",
+                value:
+                    data.sleep
+                        ?.difficulty
+            },
+
+            {
+                label: "Return to Sleep",
+                value:
+                    data.sleep
+                        ?.returnToSleepDuration
+            },
+
+            {
+                label: "Other",
+                value:
+                    data.sleep
+                        ?.other
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.sleep
+                        ?.notes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Urination ---------- */
+
+
+    addSubsection(
+        section,
+        "Urination",
+        [
+
+            {
+                label: "Daytime Frequency",
+                value:
+                    data.urination
+                        ?.daytime
+            },
+
+            {
+                label: "Nighttime Frequency",
+                value:
+                    data.urination
+                        ?.nighttime
+            },
+
+            {
+                label: "Colour",
+                value:
+                    data.urination
+                        ?.color
+            },
+
+            {
+                label: "Amount",
+                value:
+                    data.urination
+                        ?.amount
+            },
+
+            {
+                label: "Odour",
+                value:
+                    data.urination
+                        ?.odor
+            },
+
+            {
+                label: "Symptoms",
+                value:
+                    data.urination
+                        ?.symptoms
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.urination
+                        ?.notes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Bowel Movement ---------- */
+
+
+    addSubsection(
+        section,
+        "Bowel Movement",
+        [
+
+            {
+                label: "Frequency",
+                value:
+                    data.bowelMovement
+                        ?.frequency
+            },
+
+            {
+                label: "Consistency",
+                value:
+                    data.bowelMovement
+                        ?.consistency
+            },
+
+            {
+                label: "Difficulty",
+                value:
+                    data.bowelMovement
+                        ?.difficulty
+            },
+
+            {
+                label: "Characteristics",
+                value:
+                    data.bowelMovement
+                        ?.characteristics
+            },
+
+            {
+                label: "Notes",
+                value:
+                    data.bowelMovement
+                        ?.notes
+            }
+
+        ]
+    );
+
+
+    /* ---------- Head and Body ---------- */
+
+
+    addSubsection(
+        section,
+        "Head and Body",
+        [
+
+            {
+                label: "Head Symptoms",
+                value:
+                    data.headBody
+                        ?.headSymptoms
+            },
+
+            {
+                label: "Headache Quality",
+                value:
+                    data.headBody
+                        ?.headacheQuality
+            },
+
+            {
+                label: "Headache Location",
+                value:
+                    data.headBody
+                        ?.headacheLocation
+            },
+
+            {
+                label: "Dizziness",
+                value:
+                    data.headBody
+                        ?.dizzinessType
+            },
+
+            {
+                label: "Numbness / Tingling",
+                value:
+                    data.headBody
+                        ?.headFaceNumbnessLocation
+            },
+
+            {
+                label: "Body Symptoms",
+                value:
+                    data.headBody
+                        ?.bodySymptoms
+            },
+
+            {
+                label: "Body Numbness Location",
+                value:
+                    data.headBody
+                        ?.bodyNumbnessLocation
+            },
+
+            {
+                label: "Muscle Stiffness Location",
+                value:
+                    data.headBody
+                        ?.muscleStiffnessLocation
+            },
+
+            {
+                label: "Swelling Location",
+                value:
+                    data.headBody
+                        ?.swellingLocation
+            }
+
+        ]
+    );
+
+
+    /* ---------- Chest and Abdomen ---------- */
+
+
+    addSubsection(
+        section,
+        "Chest and Abdomen",
+        [
+
+            {
+                label: "Chest Symptoms",
+                value:
+                    data.chestAbdomen
+                        ?.chestSymptoms
+            },
+
+            {
+                label: "Chest Pain Quality",
+                value:
+                    data.chestAbdomen
+                        ?.chestPainQuality
+            },
+
+            {
+                label: "Abdominal Symptoms",
+                value:
+                    data.chestAbdomen
+                        ?.abdominalSymptoms
+            },
+
+            {
+                label: "Abdominal Warmth",
+                value:
+                    data.chestAbdomen
+                        ?.abdominalWarmth
+            },
+
+            {
+                label: "Abdominal Pressure",
+                value:
+                    data.chestAbdomen
+                        ?.abdominalPressure
+            }
+
+        ]
+    );
+
+
+    /* ---------- Ear and Eyes ---------- */
+
+
+    addSubsection(
+        section,
+        "Ear and Eyes",
+        [
+
+            {
+                label: "Ear Symptoms",
+                value:
+                    data.earEyes
+                        ?.earSymptoms
+            },
+
+            {
+                label: "Tinnitus Type",
+                value:
+                    data.earEyes
+                        ?.tinnitusType
+            },
+
+            {
+                label: "Eye Symptoms",
+                value:
+                    data.earEyes
+                        ?.eyeSymptoms
+            }
+
+        ]
+    );
+
+
+    /* ---------- Emotion ---------- */
+
+
+    addSubsection(
+        section,
+        "Emotion",
+        [
+
+            {
+                label: "Emotional State",
+                value:
+                    data.emotion
+                        ?.emotionalState
+            },
+
+            {
+                label: "Physical Effect",
+                value:
+                    data.emotion
+                        ?.physicalEffect
+            },
+
+            {
+                label: "Physical Effect Notes",
+                value:
+                    data.emotion
+                        ?.physicalEffectNotes
+            }
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   LIFESTYLE
+   ========================================================= */
+
+
+function buildLifestyleSection(
+    container,
+    data
+) {
+
+    const section =
+        addSection(
+            container,
+            5,
+            "Lifestyle"
+        );
+
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    addSubsection(
+        section,
+        "Smoking",
+        [
+
+            {
+                label: "Smoking",
+                value:
+                    data.smoking
+                        ?.status
+            },
+
+            {
+                label: "Cigarette Duration",
+                value:
+                    data.smoking
+                        ?.cigaretteDuration
+            },
+
+            {
+                label: "Cannabis Duration",
+                value:
+                    data.smoking
+                        ?.cannabisDuration
+            }
+
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "Alcohol",
+        [
+
+            {
+                label: "Alcohol Use",
+                value:
+                    data.drinking
+                        ?.status
+            },
+
+            {
+                label: "Daily Drinking Duration",
+                value:
+                    data.drinking
+                        ?.dailyDuration
+            }
+
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "Occupation",
+        [
+
+            {
+                label: "Occupation",
+                value:
+                    data.occupation
+                        ?.occupation
+            },
+
+            {
+                label: "Work Type",
+                value:
+                    data.occupation
+                        ?.workType
+            }
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MENSTRUATION
+   ========================================================= */
+function buildMenstruationSection(
+    container,
+    data,
+    patient
+) {
+
+    // Do not show menstruation section for male patients
+    if (
+        patient &&
+        String(patient.sex).toLowerCase() !== "female"
+    ) {
+        return;
+    }
+
+    // Do not show menstruation section if there is no data
+    if (!data) {
+        return;
+    }
+
+    // Do not show menstruation section if the patient selected "No"
+    // for menstrual history applicability
+    const applicable =
+        String(data.applicable || "").toLowerCase();
+
+    if (
+        applicable === "no" ||
+        applicable === "not applicable" ||
+        applicable === "n/a"
+    ) {
+        return;
+    }
+
+    const section =
+        addSection(
+            container,
+            6,
+            "Female Health / Menstruation"
+        );
+
+
+    addSubsection(
+        section,
+        "Menstrual Status",
+        [
+            {
+                label: "Applicable",
+                value:
+                    data.applicable
+            },
+
+            {
+                label: "Menstrual Status",
+                value:
+                    data.menstrualStatus
+            },
+
+            {
+                label: "Last Menstrual Period",
+                value:
+                    data.lastMenstrualPeriod
+            },
+
+            {
+                label: "Menarche Age",
+                value:
+                    data.menarcheAge
+            }
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "Cycle and Bleeding",
+        [
+            {
+                label: "Regularity",
+                value:
+                    data.regularity
+            },
+
+            {
+                label: "Cycle Length",
+                value:
+                    data.cycleLength
+            },
+
+            {
+                label: "Bleeding Duration",
+                value:
+                    data.bleedingDuration
+            },
+
+            {
+                label: "Flow Amount",
+                value:
+                    data.flowAmount
+            },
+
+            {
+                label: "Pad Count",
+                value:
+                    data.padCount
+            },
+
+            {
+                label: "Blood Colour",
+                value:
+                    data.bloodColours
+            },
+
+            {
+                label: "Clots",
+                value:
+                    data.clots
+            },
+
+            {
+                label: "Clot Details",
+                value:
+                    data.clotDetails
+            }
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "Menstrual Pain",
+        [
+            {
+                label: "Menstrual Pain",
+                value:
+                    data.menstrualPain
+            },
+
+            {
+                label: "Pain Timing",
+                value:
+                    data.painTiming
+            },
+
+            {
+                label: "Pain Score",
+                value:
+                    data.menstrualPainScore
+            },
+
+            {
+                label: "Pain Location",
+                value:
+                    data.menstrualPainLocation
+            },
+
+            {
+                label: "Pain Relief",
+                value:
+                    data.painRelief
+            }
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "PMS and Spotting",
+        [
+            {
+                label: "PMS",
+                value:
+                    data.pms
+            },
+
+            {
+                label: "PMS Other",
+                value:
+                    data.pmsOther
+            },
+
+            {
+                label: "Spotting",
+                value:
+                    data.spotting
+            },
+
+            {
+                label: "Spotting Details",
+                value:
+                    data.spottingDetails
+            },
+
+            {
+                label: "Discharge Details",
+                value:
+                    data.dischargeDetails
+            }
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "Pregnancy and Reproductive History",
+        [
+            {
+                label: "Gravida",
+                value:
+                    data.gravida
+            },
+
+            {
+                label: "Para",
+                value:
+                    data.para
+            },
+
+            {
+                label: "Pregnancy History",
+                value:
+                    data.pregnancyHistory
+            },
+
+            {
+                label: "Fertility Concerns",
+                value:
+                    data.fertilityConcerns
+            },
+
+            {
+                label: "Contraception",
+                value:
+                    data.contraception
+            },
+
+            {
+                label: "Reproductive Care",
+                value:
+                    data.reproductiveCare
+            }
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   TONGUE
+   ========================================================= */
+
+
+function buildTongueSection(
+    container,
+    data
+) {
+
+    const section =
+        addSection(
+            container,
+            7,
+            "Tongue Inspection"
+        );
+
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    addSubsection(
+        section,
+        "Tongue Body",
+        [
+
+            {
+                label: "Body Colour",
+                value:
+                    data.bodyColour
+            },
+
+            {
+                label: "Body Shape",
+                value:
+                    data.bodyShape
+            },
+
+            {
+                label: "Body Signs",
+                value:
+                    data.bodySigns
+            },
+
+            {
+                label: "Sublingual Veins",
+                value:
+                    data.sublingualVeins
+            }
+
+        ]
+    );
+
+
+    addSubsection(
+        section,
+        "Tongue Coating",
+        [
+
+            {
+                label: "Coating Colour",
+                value:
+                    data.coatingColour
+            },
+
+            {
+                label: "Coating Thickness",
+                value:
+                    data.coatingThickness
+            }
+
+        ]
+    );
+
+
+    /* ---------- Regional observations ---------- */
+
+
+    const bodyRegions =
+        data.bodyRegions;
+
+
+    const coatingRegions =
+        data.coatingRegions;
+
+
+    if (
+        bodyRegions ||
+        coatingRegions
+    ) {
+
+        const rows = [];
+
+        const regionNames = [
+            "Tip",
+            "Anterior",
+            "Centre",
+            "Root",
+            "Sides"
+        ];
+
+
+        regionNames.forEach(region => {
+
+            const bodyValue =
+                bodyRegions?.[region.toLowerCase()];
+
+
+            const coatingValue =
+                coatingRegions?.[region.toLowerCase()];
+
+
+            if (
+                !isEmptyValue(bodyValue) ||
+                !isEmptyValue(coatingValue)
+            ) {
+
+                rows.push({
+                    region: region,
+                    body: bodyValue,
+                    coating: coatingValue
+                });
+
+            }
+
+        });
+
+
+        if (rows.length > 0) {
+
+            const subsection =
+                document.createElement("div");
+
+            subsection.className =
+                "subsection";
+
+
+            const heading =
+                document.createElement("h3");
+
+            heading.textContent =
+                "Regional Findings";
+
+
+            subsection.appendChild(heading);
+
+
+            const table =
+                document.createElement("table");
+
+            table.className =
+                "pulse-table";
+
+
+            const header =
+                document.createElement("tr");
+
+
+            [
+                "Region",
+                "Tongue Body",
+                "Coating"
+            ].forEach(text => {
+
+                const th =
+                    document.createElement("th");
+
+                th.textContent =
+                    text;
+
+                header.appendChild(th);
+
+            });
+
+
+            table.appendChild(header);
+
+
+            rows.forEach(row => {
+
+                const tr =
+                    document.createElement("tr");
+
+
+                const regionCell =
+                    document.createElement("td");
+
+                regionCell.textContent =
+                    row.region;
+
+
+                const bodyCell =
+                    document.createElement("td");
+
+                bodyCell.textContent =
+                    formatValue(row.body);
+
+
+                const coatingCell =
+                    document.createElement("td");
+
+                coatingCell.textContent =
+                    formatValue(row.coating);
+
+
+                tr.appendChild(regionCell);
+                tr.appendChild(bodyCell);
+                tr.appendChild(coatingCell);
+
+
+                table.appendChild(tr);
+
+            });
+
+
+            subsection.appendChild(table);
+
+            section.appendChild(subsection);
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PULSE
+   ========================================================= */
+
+function buildPulseSection(
+    container,
+    data
+) {
+
+    const section =
+        addSection(
+            container,
+            8,
+            "Pulse Palpation"
+        );
+
+
+    if (!data || !data.positions) {
+        return;
+    }
+
+
+    const positions = [
+
+        {
+            key: "leftCun",
+            label: "Left Cun"
+        },
+
+        {
+            key: "leftGuan",
+            label: "Left Guan"
+        },
+
+        {
+            key: "leftChi",
+            label: "Left Chi"
+        },
+
+        {
+            key: "rightCun",
+            label: "Right Cun"
+        },
+
+        {
+            key: "rightGuan",
+            label: "Right Guan"
+        },
+
+        {
+            key: "rightChi",
+            label: "Right Chi"
+        }
+
+    ];
+
+
+    const table =
+        document.createElement("table");
+
+    table.className =
+        "pulse-table";
+
+
+    const header =
+        document.createElement("tr");
+
+
+    [
+        "Position",
+        "Level",
+        "Strength",
+        "Rate",
+        "Rhythm",
+        "Shape",
+        "Notes"
+    ].forEach(text => {
+
+        const th =
+            document.createElement("th");
+
+        th.textContent = text;
+
+        header.appendChild(th);
+
+    });
+
+
+    table.appendChild(header);
+
+
+    let hasData = false;
+
+
+    positions.forEach(position => {
+
+        const pulse =
+            data.positions[position.key];
+
+
+        if (!pulse) {
+            return;
+        }
+
+
+        if (
+            isEmptyValue(pulse.level) &&
+            isEmptyValue(pulse.strength) &&
+            isEmptyValue(pulse.rate) &&
+            isEmptyValue(pulse.rhythm) &&
+            isEmptyValue(pulse.shape) &&
+            isEmptyValue(pulse.notes)
+        ) {
+
+            return;
+
+        }
+
+
+        hasData = true;
+
+
+        const row =
+            document.createElement("tr");
+
+
+        const values = [
+
+            position.label,
+
+            pulse.level,
+
+            pulse.strength,
+
+            pulse.rate,
+
+            pulse.rhythm,
+
+            pulse.shape,
+
+            pulse.notes
+
+        ];
+
+
+        values.forEach(value => {
+
+            const cell =
+                document.createElement("td");
+
+            cell.textContent =
+                formatValue(value);
+
+            row.appendChild(cell);
+
+        });
+
+
+        table.appendChild(row);
+
+    });
+
+
+    if (hasData) {
+
+        section.appendChild(table);
+
+    }
+
+}
+
+
+/* =========================================================
+   ENERGY AND PAIN
+   ========================================================= */
+
+
+function buildScoreSection(
+    container,
+    data
+) {
+
+    const section =
+        addSection(
+            container,
+            9,
+            "Energy and Pain Score"
+        );
+
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    const table =
+        createTable([
+
+            {
+                label: "Energy Score",
+                value:
+                    data.energy?.score
+            },
+
+            {
+                label: "Energy Details",
+                value:
+                    data.energy?.details
+            },
+
+            {
+                label: "Pain Score",
+                value:
+                    data.painScore
+            },
+
+            {
+                label: "Pain Details",
+                value:
+                    data.painScoreDetails
+            }
+
+        ]);
+
+
+    if (table) {
+
+        section.appendChild(table);
+
+    }
+
+}
+
+
+/* =========================================================
+   OTHER CONCERNS
+   ========================================================= */
+
+
+function buildOtherSection(
+    container,
+    data
+) {
+
+    const section =
+        addSection(
+            container,
+            10,
+            "Other Concerns"
+        );
+
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    const table =
+        createTable([
+
+            {
+                label: "Other Concerns",
+                value:
+                    data.others
+            }
+
+        ]);
+
+
+    if (table) {
+
+        section.appendChild(table);
+
+    }
+
+}
+
+
+/* =========================================================
+   BUILD SUMMARY
+   ========================================================= */
+
+
+function buildCaseSummary() {
+
+    const patient =
+        getData("patient");
+
+
+    const painAssessment =
+        getData("painAssessment");
+
+
+    const generalInquiry =
+        getData("generalInquiry");
+
+
+    const lifestyle =
+        getData("lifestyle");
+
+
+    const menstruation =
+        getFirstAvailableData([
+            "menstrualHistory"
+        ]);
+
+
+    const tongue =
+        getFirstAvailableData([
+            "tongue",
+            "tongueInspection",
+            "tongueData"
+        ]);
+
+
+const pulse = getData("pulsePalpation");
+
+
+    const container =
+        document.getElementById(
+            "caseSummary"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const title =
+        document.createElement("h2");
+
+    title.textContent =
+        "TCM CLINICAL CASE SUMMARY";
+
+
+    container.appendChild(title);
+
+
+    buildPatientSection(
+        container,
+        patient
+    );
+
+
+    buildChiefComplaintSection(
+        container,
+        painAssessment
+    );
+
+
+    buildHPISection(
+        container,
+        painAssessment
+    );
+
+
+    buildGeneralInquirySection(
+        container,
+        generalInquiry
+    );
+
+
+    buildLifestyleSection(
+        container,
+        lifestyle
+    );
+
+
+   buildMenstruationSection(
+    container,
+    menstruation,
+    patient
+);
+
+
+    buildTongueSection(
+        container,
+        tongue
+    );
+
+
+    buildPulseSection(
+        container,
+        pulse
+    );
+
+
+    buildScoreSection(
+        container,
+        generalInquiry
+    );
+
+
+    buildOtherSection(
+        container,
+        generalInquiry
+    );
+
+
+    const missingData = [];
+
+
+    if (!tongue) {
+
+        missingData.push(
+            "Tongue Inspection"
+        );
+
+    }
+
+
+    if (!pulse) {
+
+        missingData.push(
+            "Pulse Palpation"
+        );
+
+    }
+
+
+    if (
+        patient?.sex === "Female" &&
+        !menstruation
+    ) {
+
+        missingData.push(
+            "Female Health / Menstruation"
+        );
+
+    }
+
+
+    if (missingData.length > 0) {
+
+        document.getElementById(
+            "dataNotice"
+        ).textContent =
+            "The following sections were not found: " +
+            missingData.join(", ") +
+            ".";
+
+    }
+
+}
+
+
+/* =========================================================
+   COPY SUMMARY
+   ========================================================= */
+
+
+function copySummary() {
+
+    const summaryText =
+        document.getElementById(
+            "caseSummary"
+        ).innerText;
+
+
+    const temporaryTextArea =
+        document.createElement("textarea");
+
+
+    temporaryTextArea.value =
+        summaryText;
+
+
+    document.body.appendChild(
+        temporaryTextArea
+    );
+
+
+    temporaryTextArea.select();
+
+
+    document.execCommand("copy");
+
+
+    document.body.removeChild(
+        temporaryTextArea
+    );
+
+
+    alert(
+        "Case summary copied."
+    );
+
+}
+
+
+/* =========================================================
+   PAGE LOAD
+   ========================================================= */
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    buildCaseSummary
+);
+
+</script>
+<!-- Generate School Excel Button -->
+
+<!-- Generate School Excel Button -->
+
+<div style="margin-top: 30px; text-align: center;">
+
+    <button
+        type="button"
+        onclick="generateSchoolExcel()"
+        style="
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+        "
+    >
+        Generate School Excel
+    </button>
+
+</div>
+
+
+<script>
+async function generateSchoolExcel() {
+
+    try {
+
+        // =========================================
+        // 1. LOAD SCHOOL TEMPLATE
+        // =========================================
+
+        const response =
+            await fetch("school-template.xlsx");
+
+        if (!response.ok) {
+            throw new Error(
+                "Unable to load school-template.xlsx"
+            );
+        }
+
+        const templateData =
+            await response.arrayBuffer();
+
+
+        // =========================================
+        // 2. OPEN XLSX AS ZIP
+        // =========================================
+
+        const zip =
+            await JSZip.loadAsync(templateData);
+
+
+        // =========================================
+        // 3. LOAD PATIENT DATA
+        // =========================================
+
+        const patient =
+            JSON.parse(
+                localStorage.getItem("patient") || "{}"
+            );
+        const painAssessment =
+            JSON.parse(
+        localStorage.getItem("painAssessment") || "{}"
+         );
+         const generalInquiry =
+         JSON.parse(
+        localStorage.getItem("generalInquiry") || "{}"
+         );
+         const menstrualHistory =
+    JSON.parse(
+        localStorage.getItem("menstrualHistory") || "{}"
+    );
+
+const lifestyle =
+    JSON.parse(
+        localStorage.getItem("lifestyle") || "{}"
+    );
+const medicalHistory =
+    JSON.parse(
+        localStorage.getItem("medicalHistory") || "{}"
+    );
+const tongueInspection =
+    JSON.parse(
+        localStorage.getItem("tongueInspection") || "{}"
+    );
+
+const pulsePalpation =
+    JSON.parse(
+        localStorage.getItem("pulsePalpation") || "{}"
+    );
+
+const treatmentPlan =
+    JSON.parse(
+        localStorage.getItem("treatmentPlan") || "{}"
+    );
+
+
+
+        // =========================================
+        // 4. LOAD WORKSHEET XML
+        // =========================================
+
+        const worksheetPath =
+            "xl/worksheets/sheet1.xml";
+
+        const worksheetFile =
+            zip.file(worksheetPath);
+
+        if (!worksheetFile) {
+            throw new Error(
+                "sheet1.xml was not found."
+            );
+        }
+
+        let worksheetXml =
+            await worksheetFile.async("string");
+
+
+        // =========================================
+        // 5. HELPER FUNCTION
+        //    WRITE TEXT INTO EXISTING CELL
+        // =========================================
+
+        function setCellText(
+    xml,
+    cellReference,
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return xml;
+    }
+
+
+    // Parse worksheet XML safely
+    const parser =
+        new DOMParser();
+
+    const xmlDoc =
+        parser.parseFromString(
+            xml,
+            "application/xml"
+        );
+
+
+    // Check for XML parsing errors
+    const parserError =
+        xmlDoc.querySelector(
+            "parsererror"
+        );
+
+    if (parserError) {
+
+        throw new Error(
+            "Unable to parse worksheet XML."
+        );
+
+    }
+
+
+    // Find the target cell
+    const cells =
+        xmlDoc.getElementsByTagName("c");
+
+    let targetCell = null;
+
+
+    for (
+        let i = 0;
+        i < cells.length;
+        i++
+    ) {
+
+        if (
+            cells[i].getAttribute("r")
+            === cellReference
+        ) {
+
+            targetCell =
+                cells[i];
+
+            break;
+
+        }
+
+    }
+
+
+    if (!targetCell) {
+
+        console.warn(
+            "Cell not found:",
+            cellReference
+        );
+
+        return xml;
+
+    }
+
+
+    // Remove existing cell value/content
+    while (
+        targetCell.firstChild
+    ) {
+
+        targetCell.removeChild(
+            targetCell.firstChild
+        );
+
+    }
+
+
+    // Change cell type to inline string
+    targetCell.setAttribute(
+        "t",
+        "inlineStr"
+    );
+
+
+    // Create:
+    // <is><t xml:space="preserve">VALUE</t></is>
+
+    const namespace =
+        xmlDoc.documentElement
+            .namespaceURI;
+
+
+    const inlineString =
+        xmlDoc.createElementNS(
+            namespace,
+            "is"
+        );
+
+
+    const textElement =
+        xmlDoc.createElementNS(
+            namespace,
+            "t"
+        );
+
+
+    textElement.setAttributeNS(
+        "http://www.w3.org/XML/1998/namespace",
+        "xml:space",
+        "preserve"
+    );
+
+
+    textElement.textContent =
+        String(value);
+
+
+    inlineString.appendChild(
+        textElement
+    );
+
+
+    targetCell.appendChild(
+        inlineString
+    );
+
+
+    // Convert XML DOM back to text
+    const serializer =
+        new XMLSerializer();
+
+
+    return serializer.serializeToString(
+        xmlDoc
+    );
+
+}
+// =========================================
+// BUILD SCHOOL HPI TEXT
+// =========================================
+
+function cleanValues(values) {
+
+    return values
+        .filter(value =>
+            value !== null &&
+            value !== undefined &&
+            value !== ""
+        )
+        .join("; ");
+
+}
+
+
+// Onset
+const hpiOnset =
+    cleanValues([
+        painAssessment.O?.onsetType,
+        painAssessment.O?.duration
+    ]);
+
+
+// Cause
+const hpiCause =
+    painAssessment.O?.associatedCause || "";
+
+
+// Main Symptoms and Characteristics
+const mainSymptomsParts = [];
+
+if (painAssessment.R?.location) {
+    mainSymptomsParts.push(
+        "Location: " +
+        painAssessment.R.location
+    );
+}
+
+if (painAssessment.Q?.quality) {
+    mainSymptomsParts.push(
+        "Quality: " +
+        painAssessment.Q.quality
+    );
+}
+
+if (
+    painAssessment.Q?.other &&
+    painAssessment.Q.other.trim()
+) {
+
+    mainSymptomsParts.push(
+        painAssessment.Q.other.trim()
+    );
+
+}
+
+if (painAssessment.S?.current) {
+    mainSymptomsParts.push(
+        "Current severity: " +
+        painAssessment.S.current +
+        "/10"
+    );
+}
+
+if (painAssessment.R?.radiation) {
+
+    let radiationText =
+        "Radiation: " +
+        painAssessment.R.radiation;
+
+    if (
+        painAssessment.R
+            ?.radiationLocation
+    ) {
+
+        radiationText +=
+            " (" +
+            painAssessment.R
+                .radiationLocation +
+            ")";
+    }
+
+    mainSymptomsParts.push(
+        radiationText
+    );
+}
+
+if (painAssessment.T?.pattern) {
+    mainSymptomsParts.push(
+        "Pattern: " +
+        painAssessment.T.pattern
+    );
+}
+
+const hpiMainSymptoms =
+    mainSymptomsParts.join("; ");
+
+
+// Relieving / Exacerbating Factors
+const factorParts = [];
+
+if (painAssessment.P?.worse) {
+    factorParts.push(
+        "Worse with: " +
+        painAssessment.P.worse
+    );
+}
+
+if (painAssessment.P?.better) {
+    factorParts.push(
+        "Better with: " +
+        painAssessment.P.better
+    );
+}
+
+const hpiFactors =
+    factorParts.join("; ");
+
+
+// Development
+const hpiDevelopment =
+    painAssessment.T?.development || "";
+
+// =========================================
+// BUILD SCHOOL GENERAL INFORMATION TEXT
+// =========================================
+
+function schoolText(values) {
+
+    return values
+        .flat()
+        .filter(value =>
+            value !== null &&
+            value !== undefined &&
+            String(value).trim() !== ""
+        )
+        .map(value =>
+            String(value).trim()
+        )
+        .join("; ");
+
+}
+
+// =========================================
+// BUILD SCHOOL FEMALE INFORMATION TEXT
+// =========================================
+
+const femaleMenstrualInfo =
+    schoolText([
+
+        menstrualHistory.regularity
+            ? "Regularity: " +
+              menstrualHistory.regularity
+            : "",
+
+        menstrualHistory.lastMenstrualPeriod
+            ? "LMP: " +
+              menstrualHistory.lastMenstrualPeriod
+            : "",
+
+        menstrualHistory.menarcheAge
+            ? "Menarche: age " +
+              menstrualHistory.menarcheAge
+            : "",
+
+        menstrualHistory.cycleLength
+            ? "Cycle length: " +
+              menstrualHistory.cycleLength +
+              " days"
+            : "",
+
+        menstrualHistory.bleedingDuration
+            ? "Bleeding duration: " +
+              menstrualHistory.bleedingDuration +
+              " days"
+            : "",
+
+        menstrualHistory.flowAmount
+            ? "Flow: " +
+              menstrualHistory.flowAmount
+            : "",
+
+        menstrualHistory.bloodColours,
+
+        menstrualHistory.clots
+            ? "Clots: " +
+              menstrualHistory.clots
+            : "",
+
+        menstrualHistory.clotDetails,
+
+        menstrualHistory.menstrualPain
+            ? "Menstrual pain: " +
+              menstrualHistory.menstrualPain
+            : "",
+
+        menstrualHistory.menstrualPainScore
+            ? "Pain: " +
+              menstrualHistory.menstrualPainScore +
+              "/10"
+            : "",
+
+        menstrualHistory.menstrualPainLocation
+            ? "Pain location: " +
+              menstrualHistory.menstrualPainLocation
+            : "",
+
+        menstrualHistory.painTiming
+            ? "Pain timing: " +
+              menstrualHistory.painTiming
+            : "",
+
+        menstrualHistory.painRelief
+            ? "Pain relief: " +
+              menstrualHistory.painRelief
+            : "",
+
+        menstrualHistory.pms,
+
+        menstrualHistory.pmsOther,
+
+        menstrualHistory.spotting
+            ? "Spotting: " +
+              menstrualHistory.spotting
+            : "",
+
+        menstrualHistory.spottingDetails,
+
+        menstrualHistory.menstrualStatus,
+
+        menstrualHistory.cycleChanges,
+
+        menstrualHistory.dischargeDetails
+
+    ]);
+
+
+const femaleReproductiveInfo =
+    schoolText([
+
+        menstrualHistory.gravida
+            ? "Gravida: " +
+              menstrualHistory.gravida
+            : "",
+
+        menstrualHistory.para
+            ? "Para: " +
+              menstrualHistory.para
+            : "",
+
+        menstrualHistory.pregnancyHistory,
+
+        menstrualHistory.fertilityConcerns,
+
+        menstrualHistory.contraception,
+
+        menstrualHistory.reproductiveCare
+
+    ]);
+
+// =========================================
+// BUILD SCHOOL LIFESTYLE TEXT
+// =========================================
+
+const schoolSmoking =
+    schoolText([
+
+        lifestyle.smoking?.status
+            ? "Smoking: " +
+              lifestyle.smoking.status
+            : "",
+
+        lifestyle.smoking
+            ?.cigaretteDuration,
+
+        lifestyle.smoking
+            ?.cannabisDuration
+
+    ]);
+
+
+const schoolDrinking =
+    schoolText([
+
+        lifestyle.drinking?.status
+            ? "Drinking: " +
+              lifestyle.drinking.status
+            : "",
+
+        lifestyle.drinking
+            ?.dailyDuration
+
+    ]);
+
+
+const schoolOccupation =
+    schoolText([
+
+        lifestyle.occupation?.occupation
+            ? "Occupation: " +
+              lifestyle.occupation.occupation
+            : "",
+
+        lifestyle.occupation?.workType
+
+    ]);
+// =========================================
+// BUILD SCHOOL MEDICAL HISTORY TEXT
+// =========================================
+
+const schoolPastMedicalHistory =
+    schoolText([
+
+        medicalHistory.conditions?.length
+            ? "Conditions: " +
+              medicalHistory.conditions.join(", ")
+            : "",
+
+        medicalHistory.conditionOther
+            ? "Other conditions: " +
+              medicalHistory.conditionOther.trim()
+            : "",
+
+        medicalHistory.allergies
+            ? "Allergies: " +
+              medicalHistory.allergies.trim()
+            : "",
+
+        medicalHistory.surgeryHospitalization
+            ? "Surgery / hospitalization / major injury: " +
+              medicalHistory.surgeryHospitalization.trim()
+            : "",
+
+        medicalHistory.medications?.length
+            ? "Current medications: " +
+              medicalHistory.medications.join(", ")
+            : "",
+
+        medicalHistory.otherMedication
+            ? "Other medications / vitamins / herbs: " +
+              medicalHistory.otherMedication.trim()
+            : ""
+
+    ]);
+
+
+const schoolFamilyHistory =
+    medicalHistory.familyHistory
+        ? medicalHistory.familyHistory.trim()
+        : "";
+// =========================================
+// BUILD SCHOOL TONGUE TEXT
+// =========================================
+
+const tongueBodyParts = [];
+
+if (tongueInspection.bodyColour?.length) {
+    tongueBodyParts.push(
+        "Colour: " +
+        tongueInspection.bodyColour.join(", ")
+    );
+}
+
+if (tongueInspection.bodyShape?.length) {
+    tongueBodyParts.push(
+        "Shape: " +
+        tongueInspection.bodyShape.join(", ")
+    );
+}
+
+if (tongueInspection.bodySigns?.length) {
+    tongueBodyParts.push(
+        "Signs: " +
+        tongueInspection.bodySigns.join(", ")
+    );
+}
+
+if (tongueInspection.sublingualVeins?.length) {
+    tongueBodyParts.push(
+        "Sublingual veins: " +
+        tongueInspection.sublingualVeins.join(", ")
+    );
+}
+
+if (
+    tongueInspection.bodyNotes &&
+    tongueInspection.bodyNotes.trim()
+) {
+    tongueBodyParts.push(
+        tongueInspection.bodyNotes.trim()
+    );
+}
+
+
+// Regional tongue body observations
+const bodyRegionLabels = {
+    Tip: "Tip",
+    Anterior: "Anterior",
+    Centre: "Centre",
+    Root: "Root",
+    Sides: "Sides"
+};
+
+Object.entries(
+    tongueInspection.bodyRegions || {}
+).forEach(([region, value]) => {
+
+    if (
+        value &&
+        String(value).trim()
+    ) {
+        tongueBodyParts.push(
+            (bodyRegionLabels[region] || region) +
+            ": " +
+            String(value).trim()
+        );
+    }
+
+});
+
+const schoolTongueBody =
+    tongueBodyParts.join("; ");
+
+
+// -----------------------------------------
+// Tongue Coating
+// -----------------------------------------
+
+const tongueCoatingParts = [];
+
+if (tongueInspection.coatingColour?.length) {
+    tongueCoatingParts.push(
+        "Colour: " +
+        tongueInspection.coatingColour.join(", ")
+    );
+}
+
+if (tongueInspection.coatingThickness?.length) {
+    tongueCoatingParts.push(
+        "Thickness: " +
+        tongueInspection.coatingThickness.join(", ")
+    );
+}
+
+if (tongueInspection.coatingQuality?.length) {
+    tongueCoatingParts.push(
+        "Quality / distribution: " +
+        tongueInspection.coatingQuality.join(", ")
+    );
+}
+
+if (
+    tongueInspection.coatingNotes &&
+    tongueInspection.coatingNotes.trim()
+) {
+    tongueCoatingParts.push(
+        tongueInspection.coatingNotes.trim()
+    );
+}
+
+
+// Regional coating observations
+Object.entries(
+    tongueInspection.coatingRegions || {}
+).forEach(([region, value]) => {
+
+    if (
+        value &&
+        String(value).trim()
+    ) {
+        tongueCoatingParts.push(
+            (bodyRegionLabels[region] || region) +
+            ": " +
+            String(value).trim()
+        );
+    }
+
+});
+
+const schoolTongueCoating =
+    tongueCoatingParts.join("; ");
+
+// =========================================
+// BUILD SCHOOL PULSE TEXT
+// =========================================
+
+const pulsePositions =
+    pulsePalpation.positions || {};
+
+const pulsePositionLabels = {
+    leftCun: "L Cun",
+    leftGuan: "L Guan",
+    leftChi: "L Chi",
+    rightCun: "R Cun",
+    rightGuan: "R Guan",
+    rightChi: "R Chi"
+};
+
+
+function buildPulseRow(property) {
+
+    const parts = [];
+
+    Object.entries(
+        pulsePositionLabels
+    ).forEach(([key, label]) => {
+
+        const value =
+            pulsePositions[key]?.[property];
+
+        if (
+            value !== null &&
+            value !== undefined &&
+            String(value).trim() !== ""
+        ) {
+
+            parts.push(
+                label +
+                ": " +
+                String(value).trim()
+            );
+
+        }
+
+    });
+
+    return parts.join("; ");
+}
+
+
+const schoolPulseLevel =
+    buildPulseRow("level");
+
+const schoolPulseStrength =
+    buildPulseRow("strength");
+
+const schoolPulseRate =
+    buildPulseRow("rate");
+
+const schoolPulseRhythm =
+    buildPulseRow("rhythm");
+
+const schoolPulseShape =
+    buildPulseRow("shape");
+
+
+// -----------------------------------------
+// Chills / Fever
+// -----------------------------------------
+
+const schoolChillsFever =
+    schoolText([
+
+        generalInquiry.chillsFever
+            ?.temperatureSensation,
+
+        generalInquiry.chillsFever
+            ?.coldCharacteristics,
+
+        generalInquiry.chillsFever
+            ?.hotCharacteristics,
+
+        generalInquiry.chillsFever
+            ?.feverStatus,
+
+        generalInquiry.chillsFever
+            ?.highestTemperature,
+
+        generalInquiry.chillsFever
+            ?.feverTiming,
+
+        generalInquiry.chillsFever
+            ?.associatedSymptoms,
+
+        generalInquiry.chillsFever
+            ?.notes
+
+    ]);
+
+
+// -----------------------------------------
+// Sweating
+// -----------------------------------------
+
+const schoolSweating =
+    schoolText([
+
+        generalInquiry.sweating
+            ?.ease,
+
+        generalInquiry.sweating
+            ?.timing,
+
+        generalInquiry.sweating
+            ?.spontaneousSweatingTime,
+
+        generalInquiry.sweating
+            ?.amount,
+
+        generalInquiry.sweating
+            ?.locationType,
+
+        generalInquiry.sweating
+            ?.specificLocations,
+
+        generalInquiry.sweating
+            ?.notes
+
+    ]);
+
+
+// -----------------------------------------
+// Appetite
+// -----------------------------------------
+
+const schoolAppetite =
+    schoolText([
+
+        generalInquiry.appetite
+            ?.level,
+
+        generalInquiry.appetite
+            ?.meals,
+
+        generalInquiry.appetite
+            ?.typicalFood,
+
+        generalInquiry.appetite
+            ?.cravings,
+
+        generalInquiry.appetite
+            ?.habits,
+
+        generalInquiry.appetite
+            ?.appetiteNotes
+
+    ]);
+
+
+// -----------------------------------------
+// Thirst
+// -----------------------------------------
+
+const schoolThirst =
+    schoolText([
+
+        generalInquiry.thirst
+            ?.level,
+
+        generalInquiry.thirst
+            ?.fluidIntake,
+
+        generalInquiry.thirst
+            ?.drinkingPreference,
+
+        generalInquiry.thirst
+            ?.characteristics,
+
+        generalInquiry.thirst
+            ?.thirstNotes
+
+    ]);
+
+
+// -----------------------------------------
+// Urination
+// -----------------------------------------
+
+const schoolUrination =
+    schoolText([
+
+        generalInquiry.urination
+            ?.daytime,
+
+        generalInquiry.urination
+            ?.nighttime,
+
+        generalInquiry.urination
+            ?.color,
+
+        generalInquiry.urination
+            ?.amount,
+
+        generalInquiry.urination
+            ?.odor,
+
+        generalInquiry.urination
+            ?.symptoms,
+
+        generalInquiry.urination
+            ?.notes
+
+    ]);
+
+
+// -----------------------------------------
+// Bowel Movement
+// -----------------------------------------
+
+const schoolBowelMovement =
+    schoolText([
+
+        generalInquiry.bowelMovement
+            ?.frequency,
+
+        generalInquiry.bowelMovement
+            ?.consistency,
+
+        generalInquiry.bowelMovement
+            ?.difficulty,
+
+        generalInquiry.bowelMovement
+            ?.characteristics,
+
+        generalInquiry.bowelMovement
+            ?.notes
+
+    ]);
+
+
+// -----------------------------------------
+// Head / Body
+// -----------------------------------------
+
+const schoolHeadBody =
+    schoolText([
+
+        generalInquiry.headBody
+            ?.headSymptoms,
+
+        generalInquiry.headBody
+            ?.headacheQuality,
+
+        generalInquiry.headBody
+            ?.headacheLocation,
+
+        generalInquiry.headBody
+            ?.dizzinessType,
+
+        generalInquiry.headBody
+            ?.headFaceNumbnessLocation,
+
+        generalInquiry.headBody
+            ?.bodySymptoms,
+
+        generalInquiry.headBody
+            ?.bodyNumbnessLocation,
+
+        generalInquiry.headBody
+            ?.muscleStiffnessLocation,
+
+        generalInquiry.headBody
+            ?.swellingLocation
+
+    ]);
+
+
+// -----------------------------------------
+// Chest / Abdomen
+// -----------------------------------------
+
+const schoolChestAbdomen =
+    schoolText([
+
+        generalInquiry.chestAbdomen
+            ?.chestSymptoms,
+
+        generalInquiry.chestAbdomen
+            ?.chestPainQuality,
+
+        generalInquiry.chestAbdomen
+            ?.abdominalSymptoms,
+
+        generalInquiry.chestAbdomen
+            ?.abdominalWarmth,
+
+        generalInquiry.chestAbdomen
+            ?.abdominalPressure
+
+    ]);
+
+
+// -----------------------------------------
+// Ear / Eyes
+// -----------------------------------------
+
+const schoolEarEyes =
+    schoolText([
+
+        generalInquiry.earEyes
+            ?.earSymptoms,
+
+        generalInquiry.earEyes
+            ?.tinnitusType,
+
+        generalInquiry.earEyes
+            ?.eyeSymptoms
+
+    ]);
+
+
+// -----------------------------------------
+// Sleep
+// -----------------------------------------
+
+const schoolSleep =
+    schoolText([
+
+        generalInquiry.sleep
+            ?.duration,
+
+        generalInquiry.sleep
+            ?.difficulty,
+
+        generalInquiry.sleep
+            ?.returnToSleepDuration,
+
+        generalInquiry.sleep
+            ?.other,
+
+        generalInquiry.sleep
+            ?.notes
+
+    ]);
+
+
+// -----------------------------------------
+// Emotion
+// -----------------------------------------
+
+const schoolEmotion =
+    schoolText([
+
+        generalInquiry.emotion
+            ?.emotionalState,
+
+        generalInquiry.emotion
+            ?.physicalEffect,
+
+        generalInquiry.emotion
+            ?.physicalEffectNotes
+
+    ]);
+
+
+// -----------------------------------------
+// Energy
+// -----------------------------------------
+
+let schoolEnergy = "";
+
+if (
+    generalInquiry.energy?.score !== null &&
+    generalInquiry.energy?.score !== undefined &&
+    String(
+        generalInquiry.energy.score
+    ).trim() !== ""
+) {
+
+    schoolEnergy =
+        generalInquiry.energy.score +
+        "/10";
+
+}
+
+if (
+    generalInquiry.energy?.details &&
+    String(
+        generalInquiry.energy.details
+    ).trim()
+) {
+
+    schoolEnergy +=
+        schoolEnergy
+            ? "; " +
+              String(
+                  generalInquiry.energy.details
+              ).trim()
+            : String(
+                  generalInquiry.energy.details
+              ).trim();
+
+}
+
+
+// -----------------------------------------
+// Pain
+// -----------------------------------------
+
+let schoolPain = "";
+
+if (
+    generalInquiry.pain?.score !== null &&
+    generalInquiry.pain?.score !== undefined &&
+    String(
+        generalInquiry.pain.score
+    ).trim() !== ""
+) {
+
+    schoolPain =
+        generalInquiry.pain.score +
+        "/10";
+
+}
+
+if (
+    generalInquiry.pain?.details &&
+    String(
+        generalInquiry.pain.details
+    ).trim()
+) {
+
+    schoolPain +=
+        schoolPain
+            ? "; " +
+              String(
+                  generalInquiry.pain.details
+              ).trim()
+            : String(
+                  generalInquiry.pain.details
+              ).trim();
+
+}
+
+
+// -----------------------------------------
+// Others
+// -----------------------------------------
+
+const schoolOthers =
+    generalInquiry.others
+        ? String(
+              generalInquiry.others
+          ).trim()
+        : "";
+
+    
+        // =========================================
+        // 6. WRITE FIRST PATIENT INFORMATION
+        // =========================================
+
+        worksheetXml =
+            setCellText(
+                worksheetXml,
+                "C6",
+                patient.firstName
+            );
+
+
+        worksheetXml =
+            setCellText(
+                worksheetXml,
+                "K6",
+                patient.age
+            );
+
+
+        worksheetXml =
+            setCellText(
+                worksheetXml,
+                "J7",
+                patient.sex
+            );
+
+
+        worksheetXml =
+            setCellText(
+                worksheetXml,
+                "C9",
+                patient.chiefComplaint
+            );
+
+// =========================================
+// HPI
+// =========================================
+
+
+// Onset
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C13",
+        hpiOnset
+    );
+
+
+// Cause
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C15",
+        hpiCause
+    );
+
+
+// Main Symptoms and Characteristics
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C16",
+        hpiMainSymptoms
+    );
+
+
+// Relieving / Exacerbating Factors
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C21",
+        hpiFactors
+    );
+
+
+// Development
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C23",
+        hpiDevelopment
+    );
+
+// =========================================
+// GENERAL INFORMATION
+// =========================================
+
+
+// Chills / Fever
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D36",
+        schoolChillsFever
+    );
+
+
+// Sweating
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D37",
+        schoolSweating
+    );
+
+
+// Appetite
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D38",
+        schoolAppetite
+    );
+
+
+// Thirst
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D39",
+        schoolThirst
+    );
+
+
+// Urination
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D40",
+        schoolUrination
+    );
+
+
+// Bowel Movement
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D41",
+        schoolBowelMovement
+    );
+
+
+// Head / Body
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D42",
+        schoolHeadBody
+    );
+
+
+// Chest / Abdomen
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D43",
+        schoolChestAbdomen
+    );
+
+
+// Ear / Eyes
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D44",
+        schoolEarEyes
+    );
+
+
+// Sleep
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D45",
+        schoolSleep
+    );
+
+
+// Emotion
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D46",
+        schoolEmotion
+    );
+
+
+// Energy
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D47",
+        schoolEnergy
+    );
+
+
+// Pain
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D48",
+        schoolPain
+    );
+
+
+// Others
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D49",
+        schoolOthers
+    );
+
+// =========================================
+// FEMALE INFORMATION
+// =========================================
+
+const patientSex =
+    String(
+        patient.sex || ""
+    ).toLowerCase();
+
+const femaleApplicable =
+    String(
+        menstrualHistory.applicable || ""
+    ).toLowerCase();
+
+if (
+    patientSex === "female" &&
+    femaleApplicable !== "no" &&
+    femaleApplicable !== "not applicable" &&
+    femaleApplicable !== "n/a"
+) {
+
+    const schoolFemaleInformation =
+        schoolText([
+            femaleMenstrualInfo,
+            femaleReproductiveInfo
+        ]);
+
+    worksheetXml =
+        setCellText(
+            worksheetXml,
+            "A33",
+            schoolFemaleInformation
+        );
+
+}
+
+
+// =========================================
+// LIFESTYLE
+// =========================================
+
+const schoolLifestyle =
+    schoolText([
+        schoolSmoking,
+        schoolDrinking,
+        schoolOccupation
+    ]);
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "A52",
+        schoolLifestyle
+    );
+// =========================================
+// MEDICAL HISTORY
+// =========================================
+
+
+// Past Medical History
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D56",
+        schoolPastMedicalHistory
+    );
+
+
+// Family History
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "D57",
+        schoolFamilyHistory
+    );
+
+// =========================================
+// TONGUE
+// =========================================
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C67",
+        schoolTongueBody
+    );
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C68",
+        schoolTongueCoating
+    );
+
+
+// =========================================
+// PULSE
+// =========================================
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C70",
+        schoolPulseLevel
+    );
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C71",
+        schoolPulseStrength
+    );
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C72",
+        schoolPulseRate
+    );
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C73",
+        schoolPulseRhythm
+    );
+
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "C74",
+        schoolPulseShape
+    );
+
+// =========================================
+// CLINICAL ASSESSMENT
+// =========================================
+
+
+// TCM Disease Diagnosis
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "A86",
+        treatmentPlan.tcmDisease
+    );
+
+
+// Etiology / Pathogenesis
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "A97",
+        treatmentPlan.etiologyPathogenesis
+    );
+
+
+// Syndrome Differentiation
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "A103",
+        treatmentPlan.patternDifferentiation
+    );
+
+
+// Treatment Principle
+worksheetXml =
+    setCellText(
+        worksheetXml,
+        "A110",
+        treatmentPlan.treatmentPrinciple
+    );
+
+        // =========================================
+        // 7. PUT MODIFIED XML BACK
+        // =========================================
+
+        zip.file(
+            worksheetPath,
+            worksheetXml
+        );
+
+
+        // =========================================
+        // 8. GENERATE NEW EXCEL
+        // =========================================
+
+        const newExcelFile =
+            await zip.generateAsync({
+                type: "blob",
+                mimeType:
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                compression: "DEFLATE"
+            });
+
+
+        // =========================================
+        // 9. DOWNLOAD
+        // =========================================
+
+        const downloadUrl =
+            URL.createObjectURL(
+                newExcelFile
+            );
+
+
+        const downloadLink =
+            document.createElement("a");
+
+
+        downloadLink.href =
+            downloadUrl;
+
+
+        downloadLink.download =
+            "Patient-Case-Write-Up.xlsx";
+
+
+        document.body.appendChild(
+            downloadLink
+        );
+
+
+        downloadLink.click();
+
+
+        document.body.removeChild(
+            downloadLink
+        );
+
+
+        setTimeout(
+            function() {
+
+                URL.revokeObjectURL(
+                    downloadUrl
+                );
+
+            },
+            1000
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Excel generation failed: " +
+            error.message
+        );
+
+    }
+
+}
+// =========================================
+// ANALYZE WITH CHATGPT
+// =========================================
+
+async function analyzeWithChatGPT() {
+
+    // Get the visible Case Summary
+    const summaryContainer =
+        document.getElementById(
+            "caseSummary"
+        );
+
+    if (!summaryContainer) {
+
+        alert(
+            "Unable to find the Case Summary."
+        );
+
+        return;
+    }
+
+
+    const caseText =
+        summaryContainer.innerText.trim();
+
+
+    if (!caseText) {
+
+        alert(
+            "The Case Summary is empty."
+        );
+
+        return;
+    }
+
+
+    const prompt =
+`The following is a TCM clinical case.
+
+${caseText}
+
+Based on the information above, provide a concise TCM clinical analysis.
+
+Please provide:
+
+1. TCM Disease Diagnosis
+
+2. Syndrome Differentiation
+
+3. Etiology / Pathogenesis
+Keep this brief and clinically focused.
+
+4. Treatment Principle
+
+5. Acupuncture Points
+Give the main points first.
+Add only necessary supplementary points.
+Briefly explain the point selection.
+
+Keep the answer concise and practical.
+Do not repeat the entire case history.`;
+
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            prompt
+        );
+
+
+        alert(
+            "The case has been copied. ChatGPT will now open. Paste the case into ChatGPT and send it."
+        );
+
+
+        window.open(
+            "https://chatgpt.com/",
+            "_blank"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Clipboard error:",
+            error
+        );
+
+
+        alert(
+            "Unable to copy the case to the clipboard."
+        );
+
+    }
+
+}
+</script>
+</body>
+
+</html>

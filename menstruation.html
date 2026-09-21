@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCM Clinical Assistant - Menstruation Assessment</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .patient-summary { background: #f3f3f3; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+        .section { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .section h2 { margin-top: 0; }
+        label { display: block; margin: 10px 0; }
+        input, select, textarea { width: 100%; max-width: 620px; box-sizing: border-box; padding: 8px; margin-top: 5px; font: inherit; }
+        input[type="radio"], input[type="checkbox"] { width: auto; margin-right: 6px; }
+        .options { margin: 8px 0 15px; }
+        .options label { display: inline-block; margin-right: 18px; }
+        .hidden { display: none; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; }
+        .navigation { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>TCM Clinical Assistant</h1>
+    <div class="patient-summary">
+        <h2>Patient Information</h2>
+        <p><strong>Patient:</strong> <span id="patientName"></span></p>
+        <p><strong>Age:</strong> <span id="patientAge"></span></p>
+        <p><strong>Sex:</strong> <span id="patientSex"></span></p>
+        <p><strong>Chief Complaint:</strong> <span id="patientComplaint"></span></p>
+    </div>
+
+    <h2>Female Health / Menstruation Assessment</h2>
+    <p>Complete this page only when it is relevant and the patient is comfortable answering.</p>
+
+    <div class="section">
+        <h2>Is this assessment applicable?</h2>
+        <div class="options">
+            <label><input type="radio" name="applicable" value="Yes" onchange="toggleAssessment(true)"> Yes</label>
+            <label><input type="radio" name="applicable" value="No" onchange="toggleAssessment(false)"> No — skip this assessment</label>
+        </div>
+        <label for="notApplicableReason">If not applicable, reason</label>
+        <textarea id="notApplicableReason" rows="2" placeholder="For example: patient does not menstruate, patient declined, or not relevant."></textarea>
+    </div>
+
+    <div id="assessmentContent" class="hidden">
+        <h2>Menstrual History</h2>
+
+        <div class="section">
+            <h2>Current Menstrual Status</h2>
+            <label for="menstrualStatus">Current status</label>
+            <select id="menstrualStatus">
+                <option value="">Please select</option>
+                <option>Currently menstruating</option><option>Regularly menstruating</option>
+                <option>Irregularly menstruating</option><option>Pregnant</option>
+                <option>Postpartum</option><option>Breastfeeding</option>
+                <option>Perimenopausal</option><option>Menopausal</option><option>Unsure</option>
+            </select>
+            <label for="lastMenstrualPeriod">First day of last menstrual period (LMP)</label>
+            <input type="date" id="lastMenstrualPeriod">
+            <label for="menarcheAge">Age at first menstruation (menarche)</label>
+            <input type="number" id="menarcheAge" min="0" max="100">
+        </div>
+
+        <div class="section">
+            <h2>Cycle Pattern</h2>
+            <label for="cycleLength">Usual cycle length (days)</label>
+            <input type="number" id="cycleLength" min="0" placeholder="e.g. 28">
+            <label for="bleedingDuration">Usual bleeding duration (days)</label>
+            <input type="number" id="bleedingDuration" min="0" placeholder="e.g. 5">
+            <p>Are cycles regular?</p>
+            <div class="options">
+                <label><input type="radio" name="regularity" value="Regular"> Regular</label>
+                <label><input type="radio" name="regularity" value="Irregular"> Irregular</label>
+                <label><input type="radio" name="regularity" value="Unsure"> Unsure</label>
+            </div>
+            <label for="cycleChanges">Recent changes in the cycle</label>
+            <textarea id="cycleChanges" rows="3" placeholder="For example: shorter, longer, missed periods, or no recent change."></textarea>
+        </div>
+
+        <div class="section">
+            <h2>Menstrual Flow</h2>
+            <label for="flowAmount">Usual amount of bleeding</label>
+            <select id="flowAmount"><option value="">Please select</option><option>Very light</option><option>Light</option><option>Moderate</option><option>Heavy</option><option>Very heavy</option><option>Unsure</option></select>
+            <label for="padCount">Approximate pads/tampons/cups used on the heaviest day</label>
+            <input type="text" id="padCount" placeholder="e.g. 5 pads">
+            <p>Blood colour</p>
+            <div class="options" id="bloodColourOptions">
+                <label><input type="checkbox" value="Bright red"> Bright red</label><label><input type="checkbox" value="Dark red"> Dark red</label>
+                <label><input type="checkbox" value="Pale red"> Pale red</label><label><input type="checkbox" value="Purple"> Purple</label>
+                <label><input type="checkbox" value="Brown"> Brown</label><label><input type="checkbox" value="Other"> Other</label>
+            </div>
+            <p>Blood clots</p>
+            <div class="options">
+                <label><input type="radio" name="clots" value="No"> No</label><label><input type="radio" name="clots" value="Yes"> Yes</label><label><input type="radio" name="clots" value="Unsure"> Unsure</label>
+            </div>
+            <label for="clotDetails">Clot size or other flow details</label>
+            <textarea id="clotDetails" rows="2"></textarea>
+        </div>
+
+        <div class="section">
+            <h2>Menstrual Pain</h2>
+            <p>Does the patient experience menstrual pain?</p>
+            <div class="options">
+                <label><input type="radio" name="menstrualPain" value="No" onchange="togglePain(false)"> No</label>
+                <label><input type="radio" name="menstrualPain" value="Yes" onchange="togglePain(true)"> Yes</label>
+            </div>
+            <div id="painContent" class="hidden">
+                <label for="menstrualPainScore">Pain severity (0–10)</label><input type="number" id="menstrualPainScore" min="0" max="10">
+                <p>When is the pain present?</p>
+                <div class="options" id="painTimingOptions">
+                    <label><input type="checkbox" value="Before bleeding"> Before bleeding</label><label><input type="checkbox" value="At onset"> At onset</label>
+                    <label><input type="checkbox" value="During bleeding"> During bleeding</label><label><input type="checkbox" value="After bleeding"> After bleeding</label>
+                    <label><input type="checkbox" value="Between periods"> Between periods</label>
+                </div>
+                <label for="menstrualPainLocation">Location and character of pain</label><textarea id="menstrualPainLocation" rows="3" placeholder="For example: lower abdomen, dull, stabbing, radiating to low back."></textarea>
+                <label for="painRelief">What relieves or worsens it?</label><textarea id="painRelief" rows="2"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Premenstrual Symptoms</h2>
+            <p>Select all that apply.</p>
+            <div class="options" id="pmsOptions">
+                <label><input type="checkbox" value="Breast tenderness"> Breast tenderness</label><label><input type="checkbox" value="Bloating"> Bloating</label>
+                <label><input type="checkbox" value="Mood changes"> Mood changes</label><label><input type="checkbox" value="Irritability"> Irritability</label>
+                <label><input type="checkbox" value="Headache"> Headache</label><label><input type="checkbox" value="Acne"> Acne</label>
+                <label><input type="checkbox" value="Fatigue"> Fatigue</label><label><input type="checkbox" value="None"> None</label>
+            </div>
+            <label for="pmsOther">Other premenstrual symptoms</label><textarea id="pmsOther" rows="2"></textarea>
+        </div>
+
+        <div class="section">
+            <h2>Bleeding Between Periods / Vaginal Discharge</h2>
+            <p>Bleeding or spotting between periods?</p>
+            <div class="options"><label><input type="radio" name="spotting" value="No"> No</label><label><input type="radio" name="spotting" value="Yes"> Yes</label><label><input type="radio" name="spotting" value="Unsure"> Unsure</label></div>
+            <label for="spottingDetails">Spotting details</label><textarea id="spottingDetails" rows="2"></textarea>
+            <label for="dischargeDetails">Vaginal discharge: amount, colour, texture, odour, itch, or discomfort</label><textarea id="dischargeDetails" rows="3"></textarea>
+        </div>
+
+        <div class="section">
+            <h2>Pregnancy and Reproductive History</h2>
+            <label for="gravida">Number of pregnancies (gravida)</label><input type="number" id="gravida" min="0">
+            <label for="para">Number of births after 20 weeks (para)</label><input type="number" id="para" min="0">
+            <label for="pregnancyHistory">Miscarriage, termination, ectopic pregnancy, delivery complications, or other relevant history</label><textarea id="pregnancyHistory" rows="3"></textarea>
+            <label for="fertilityConcerns">Fertility concerns or plans</label><textarea id="fertilityConcerns" rows="2"></textarea>
+        </div>
+
+        <div class="section">
+            <h2>Contraception and Relevant Care</h2>
+            <label for="contraception">Current or recent contraception</label><input type="text" id="contraception" placeholder="For example: none, condom, oral contraceptive, IUD.">
+            <label for="reproductiveCare">Relevant gynaecological diagnoses, procedures, medications, or screening history</label><textarea id="reproductiveCare" rows="3"></textarea>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button type="button" onclick="window.location.href='lifestyle.html'">← Back</button>
+        <button type="button" onclick="saveAndContinue()">Save and Continue →</button>
+    </div>
+
+    <script>
+        const patient = JSON.parse(localStorage.getItem("patient"));
+        if (patient) { document.getElementById("patientName").textContent = patient.firstName; document.getElementById("patientAge").textContent = patient.age; document.getElementById("patientSex").textContent = patient.sex; document.getElementById("patientComplaint").textContent = patient.chiefComplaint; }
+
+        function selectedValue(name) { const item = document.querySelector(`input[name="${name}"]:checked`); return item ? item.value : ""; }
+        function checkedValues(id) { return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(item => item.value); }
+        function setRadio(name, value) { const item = document.querySelector(`input[name="${name}"][value="${value}"]`); if (item) { item.checked = true; } }
+        function setCheckedValues(id, values) { document.querySelectorAll(`#${id} input`).forEach(item => { item.checked = values.includes(item.value); }); }
+        function toggleAssessment(show) { document.getElementById("assessmentContent").classList.toggle("hidden", !show); }
+        function togglePain(show) { document.getElementById("painContent").classList.toggle("hidden", !show); }
+
+        const saved = JSON.parse(localStorage.getItem("menstrualHistory"));
+        if (saved) {
+            setRadio("applicable", saved.applicable); toggleAssessment(saved.applicable === "Yes");
+            document.getElementById("notApplicableReason").value = saved.notApplicableReason || "";
+            const fields = ["menstrualStatus", "lastMenstrualPeriod", "menarcheAge", "cycleLength", "bleedingDuration", "cycleChanges", "flowAmount", "padCount", "clotDetails", "menstrualPainScore", "menstrualPainLocation", "painRelief", "pmsOther", "spottingDetails", "dischargeDetails", "gravida", "para", "pregnancyHistory", "fertilityConcerns", "contraception", "reproductiveCare"];
+            fields.forEach(id => { document.getElementById(id).value = saved[id] || ""; });
+            setRadio("regularity", saved.regularity); setRadio("clots", saved.clots); setRadio("menstrualPain", saved.menstrualPain); setRadio("spotting", saved.spotting);
+            setCheckedValues("bloodColourOptions", saved.bloodColours || []); setCheckedValues("painTimingOptions", saved.painTiming || []); setCheckedValues("pmsOptions", saved.pms || []);
+            togglePain(saved.menstrualPain === "Yes");
+        }
+
+        function saveAndContinue() {
+            const fields = ["menstrualStatus", "lastMenstrualPeriod", "menarcheAge", "cycleLength", "bleedingDuration", "cycleChanges", "flowAmount", "padCount", "clotDetails", "menstrualPainScore", "menstrualPainLocation", "painRelief", "pmsOther", "spottingDetails", "dischargeDetails", "gravida", "para", "pregnancyHistory", "fertilityConcerns", "contraception", "reproductiveCare"];
+            const menstrualHistory = { applicable: selectedValue("applicable"), notApplicableReason: document.getElementById("notApplicableReason").value, regularity: selectedValue("regularity"), bloodColours: checkedValues("bloodColourOptions"), clots: selectedValue("clots"), menstrualPain: selectedValue("menstrualPain"), painTiming: checkedValues("painTimingOptions"), pms: checkedValues("pmsOptions"), spotting: selectedValue("spotting") };
+            fields.forEach(id => { menstrualHistory[id] = document.getElementById(id).value; });
+            localStorage.setItem("menstrualHistory", JSON.stringify(menstrualHistory));
+            window.location.href = "medical-history.html";
+        }
+    </script>
+</body>
+</html>

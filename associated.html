@@ -1,0 +1,5515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TCM Clinical Assistant - General Inquiry</title>
+
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+
+        .patient-summary {
+            background: #f3f3f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+
+        textarea,
+        select {
+            width: 100%;
+            max-width: 650px;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-top: 5px;
+            font: inherit;
+        }
+
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+
+        .hidden {
+            display: none;
+        }
+
+
+        h3 {
+            margin-top: 20px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <h1>TCM Clinical Assistant</h1>
+
+
+    <!-- =====================================================
+         PATIENT INFORMATION
+    ====================================================== -->
+
+    <div class="patient-summary">
+
+        <h2>Patient Information</h2>
+
+        <p>
+            <strong>Patient:</strong>
+            <span id="patientName"></span>
+        </p>
+
+        <p>
+            <strong>Age:</strong>
+            <span id="patientAge"></span>
+        </p>
+
+        <p>
+            <strong>Sex:</strong>
+            <span id="patientSex"></span>
+        </p>
+
+        <p>
+            <strong>Chief Complaint:</strong>
+            <span id="patientComplaint"></span>
+        </p>
+
+    </div>
+
+
+    <h2>Associated Symptoms / General Inquiry</h2>
+
+    <p>
+        Section 1.4 — Significant Symptoms and Signs of General Information
+    </p>
+
+
+    <!-- =====================================================
+         DYNAMIC INQUIRY SECTIONS
+    ====================================================== -->
+
+    <div id="inquirySections"></div>
+
+
+    <!-- =====================================================
+         ENERGY
+    ====================================================== -->
+
+    <div class="section">
+
+        <h2>Energy (1/10)</h2>
+
+        <label for="energyScore">
+            Energy score
+        </label>
+
+        <select id="energyScore">
+
+            <option value="">
+                Please select
+            </option>
+
+            <option value="1">1 / 10</option>
+            <option value="2">2 / 10</option>
+            <option value="3">3 / 10</option>
+            <option value="4">4 / 10</option>
+            <option value="5">5 / 10</option>
+            <option value="6">6 / 10</option>
+            <option value="7">7 / 10</option>
+            <option value="8">8 / 10</option>
+            <option value="9">9 / 10</option>
+            <option value="10">10 / 10</option>
+
+        </select>
+
+
+        <label for="energyDetails">
+            Relevant details
+        </label>
+
+        <textarea
+            id="energyDetails"
+            rows="3"
+            placeholder="Record the patient's relevant symptoms or state none."
+        ></textarea>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAIN
+    ====================================================== -->
+
+    <div class="section">
+
+        <h2>Pain (1/10)</h2>
+
+        <label for="painScore">
+            Pain score
+        </label>
+
+        <select id="painScore">
+
+            <option value="">
+                Please select
+            </option>
+
+            <option value="1">1 / 10</option>
+            <option value="2">2 / 10</option>
+            <option value="3">3 / 10</option>
+            <option value="4">4 / 10</option>
+            <option value="5">5 / 10</option>
+            <option value="6">6 / 10</option>
+            <option value="7">7 / 10</option>
+            <option value="8">8 / 10</option>
+            <option value="9">9 / 10</option>
+            <option value="10">10 / 10</option>
+
+        </select>
+
+
+        <label for="painDetails">
+            Relevant details
+        </label>
+
+        <textarea
+            id="painDetails"
+            rows="3"
+            placeholder="Record the patient's relevant symptoms or state none."
+        ></textarea>
+
+    </div>
+
+
+    <!-- =====================================================
+         OTHERS
+    ====================================================== -->
+
+    <div class="section">
+
+        <h2>Others</h2>
+
+        <label for="others">
+            Relevant details
+        </label>
+
+        <textarea
+            id="others"
+            rows="3"
+            placeholder="Record any other significant symptoms or signs."
+        ></textarea>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            onclick="goBack()"
+        >
+            ← Back to OPQRST
+        </button>
+
+
+        <button
+            type="button"
+            onclick="saveAndContinue()"
+        >
+            Save and Continue →
+        </button>
+
+    </div>
+
+
+
+<script>
+
+
+    // =====================================================
+    // TEN QUESTIONS / GENERAL INQUIRY
+    // =====================================================
+
+    const textFields = [
+
+        ["chillsFever", "Chills/Fever"],
+
+        ["sweating", "Sweating"],
+
+        ["appetite", "Appetite"],
+
+        ["thirst", "Thirst"],
+
+        ["urination", "Urination"],
+
+        ["bowelMovement", "Bowel Movement"],
+
+        ["headBody", "Head/body"],
+
+        ["chestAbdomen", "Chest/Abdomen"],
+
+        ["earEyes", "Ear/eyes"],
+
+        ["sleep", "Sleep"],
+
+        ["emotion", "Emotion"]
+
+    ];
+
+
+
+    // =====================================================
+    // GENERATE INQUIRY SECTIONS
+    // =====================================================
+
+    document.getElementById("inquirySections").innerHTML =
+
+        textFields.map(([id, title]) => {
+
+            // =================================================
+            // ChillsFever
+            // =================================================
+
+            if (id === "chillsFever") {
+  return `
+    <div class="section">
+      <h2>Chills / Fever</h2>
+
+      <h3>1. Usual temperature sensation</h3>
+
+      <label>
+        <input type="radio"
+               name="temperatureSensation"
+               value="Usually feel cold"
+               class="temperatureSensation">
+        Usually feel cold
+      </label>
+
+      <label>
+        <input type="radio"
+               name="temperatureSensation"
+               value="Usually feel hot"
+               class="temperatureSensation">
+        Usually feel hot
+      </label>
+
+      <label>
+        <input type="radio"
+               name="temperatureSensation"
+               value="Neither / normal"
+               class="temperatureSensation">
+        Neither / normal
+      </label>
+
+      <label>
+        <input type="radio"
+               name="temperatureSensation"
+               value="Alternates between hot and cold"
+               class="temperatureSensation">
+        Alternates between hot and cold
+      </label>
+
+      <!-- Cold-related questions -->
+      <div id="coldTemperatureDetails" class="hidden">
+
+        <h3>Cold sensation</h3>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Cold all over">
+          Cold all over
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Cold mainly in hands and feet">
+          Cold mainly in hands and feet
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Cold mainly in the back">
+          Cold mainly in the back
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Cold mainly in the lower back">
+          Cold mainly in the lower back
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Cold mainly in the abdomen">
+          Cold mainly in the abdomen
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Aversion to cold">
+          Aversion to cold
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Prefers warmth">
+          Prefers warmth
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="coldCharacteristic"
+                 value="Feels cold even in a warm environment">
+          Feels cold even in a warm environment
+        </label>
+
+      </div>
+
+      <!-- Hot-related questions -->
+      <div id="hotTemperatureDetails" class="hidden">
+
+        <h3>Heat sensation</h3>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot all over">
+          Hot all over
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot in the palms">
+          Hot in the palms
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot in the soles">
+          Hot in the soles
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot sensation in the chest">
+          Hot sensation in the chest
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot in the afternoon">
+          Hot in the afternoon
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot at night">
+          Hot at night
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Hot flashes">
+          Hot flashes
+        </label>
+
+        <label>
+          <input type="checkbox"
+                 class="hotCharacteristic"
+                 value="Prefers a cool environment">
+          Prefers a cool environment
+        </label>
+
+      </div>
+
+      <h3>Fever / elevated temperature</h3>
+
+      <label>
+        <input type="radio"
+               name="feverStatus"
+               value="No known fever"
+               class="feverStatus">
+        No known fever
+      </label>
+
+      <label>
+        <input type="radio"
+               name="feverStatus"
+               value="Subjective feverish sensation"
+               class="feverStatus">
+        Subjective feverish sensation
+      </label>
+
+      <label>
+        <input type="radio"
+               name="feverStatus"
+               value="Measured fever"
+               class="feverStatus">
+        Measured fever
+      </label>
+
+      <label>
+        <input type="radio"
+               name="feverStatus"
+               value="Recurrent fever"
+               class="feverStatus">
+        Recurrent fever
+      </label>
+
+      <label>
+        <input type="radio"
+               name="feverStatus"
+               value="Low-grade fever"
+               class="feverStatus">
+        Low-grade fever
+      </label>
+
+      <label>
+        <input type="radio"
+               name="feverStatus"
+               value="Fever with chills"
+               class="feverStatus">
+        Fever with chills
+      </label>
+
+      <div id="measuredFeverDetails" class="hidden">
+
+        <h3>Measured fever details</h3>
+
+        <label for="highestTemperature">Highest temperature</label>
+        <input type="number"
+               id="highestTemperature"
+               step="0.1"
+               min="30"
+               max="45"
+               placeholder="e.g. 38.5">
+
+        <label for="temperatureMethod">How was it measured?</label>
+        <select id="temperatureMethod">
+          <option value="">Please select</option>
+          <option value="Oral">Oral</option>
+          <option value="Ear">Ear</option>
+          <option value="Forehead">Forehead</option>
+          <option value="Axillary">Axillary</option>
+          <option value="Rectal">Rectal</option>
+          <option value="Unknown">Unknown</option>
+        </select>
+
+        <label for="feverTiming">When does it usually occur?</label>
+        <select id="feverTiming">
+          <option value="">Please select</option>
+          <option value="Any time">Any time</option>
+          <option value="Morning">Morning</option>
+          <option value="Afternoon">Afternoon</option>
+          <option value="Evening">Evening</option>
+          <option value="Night">Night</option>
+          <option value="After exertion">After exertion</option>
+          <option value="Other">Other</option>
+        </select>
+
+      </div>
+
+      <h3>Associated symptoms</h3>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Sweating">
+        Sweating
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Headache">
+        Headache
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Body aches">
+        Body aches
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Fatigue">
+        Fatigue
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Thirst">
+        Thirst
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Sore throat">
+        Sore throat
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Cough">
+        Cough
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Nasal congestion">
+        Nasal congestion
+      </label>
+
+      <label>
+        <input type="checkbox"
+               class="chillsFeverAssociated"
+               value="Chills / shivering">
+        Chills / shivering
+      </label>
+
+      <label for="chillsFeverNotes">Other relevant details</label>
+      <textarea id="chillsFeverNotes"
+                rows="3"
+                placeholder="Record other relevant symptoms or state none."></textarea>
+
+    </div>
+  `;
+}
+            // =================================================
+            // Sweating
+            // =================================================
+if (id === "sweating") {
+    return `
+        <div class="section">
+            <h2>Sweating</h2>
+
+            <h3>1. Do you sweat easily?</h3>
+            <label>
+                <input type="radio" name="sweatingEase" value="No, I do not sweat easily">
+                No, I do not sweat easily
+            </label>
+            <label>
+                <input type="radio" name="sweatingEase" value="Yes, I sweat easily">
+                Yes, I sweat easily
+            </label>
+
+            <div id="sweatingDetails" class="hidden">
+
+                <h3>2. When do you usually sweat easily?</h3>
+
+                <label>
+                    <input type="checkbox" class="sweatingTiming" value="After exercise or physical activity">
+                    After exercise or physical activity
+                </label>
+
+                <label>
+                    <input type="checkbox" class="sweatingTiming" value="After slight activity">
+                    After slight activity
+                </label>
+
+                <label>
+                    <input type="checkbox" class="sweatingTiming" value="Spontaneous sweating without obvious activity">
+                    Spontaneous sweating without obvious activity
+                </label>
+
+                <label>
+                    <input type="checkbox" class="sweatingTiming" value="During sleep">
+                    During sleep
+                </label>
+
+                <label>
+                    <input type="checkbox" class="sweatingTiming" value="When nervous, anxious, or stressed">
+                    When nervous, anxious, or stressed
+                </label>
+
+                <label>
+                    <input type="checkbox" class="sweatingTiming" value="In hot weather or a warm room">
+                    In hot weather or a warm room
+                </label>
+
+
+                <div id="spontaneousSweatingDetails" class="hidden">
+
+                    <h3>3. When does the spontaneous sweating usually occur?</h3>
+
+                    <label>
+                        <input type="radio" name="spontaneousSweatingTime" value="Mostly during the daytime">
+                        Mostly during the daytime
+                    </label>
+
+                    <label>
+                        <input type="radio" name="spontaneousSweatingTime" value="Mostly at night">
+                        Mostly at night
+                    </label>
+
+                    <label>
+                        <input type="radio" name="spontaneousSweatingTime" value="Both daytime and nighttime">
+                        Both daytime and nighttime
+                    </label>
+
+                    <label>
+                        <input type="radio" name="spontaneousSweatingTime" value="At unpredictable times">
+                        At unpredictable times
+                    </label>
+
+                </div>
+
+
+                <h3>4. How much do you usually sweat?</h3>
+
+                <label>
+                    <input type="radio" name="sweatingAmount" value="Slight moisture on the skin">
+                    Slight moisture on the skin
+                </label>
+
+                <label>
+                    <input type="radio" name="sweatingAmount" value="Skin becomes clearly wet">
+                    Skin becomes clearly wet
+                </label>
+
+                <label>
+                    <input type="radio" name="sweatingAmount" value="Clothes become slightly damp">
+                    Clothes become slightly damp
+                </label>
+
+                <label>
+                    <input type="radio" name="sweatingAmount" value="Clothes become soaked">
+                    Clothes become soaked
+                </label>
+
+                <label>
+                    <input type="radio" name="sweatingAmount" value="Clothes or bedding become soaked">
+                    Clothes or bedding become soaked
+                </label>
+
+
+                <h3>5. Where do you usually sweat?</h3>
+
+                <label>
+                    <input type="radio" name="sweatingLocationType" value="Whole body">
+                    Whole body
+                </label>
+
+                <label>
+                    <input type="radio" name="sweatingLocationType" value="Mainly one specific area">
+                    Mainly one specific area
+                </label>
+
+                <label>
+                    <input type="radio" name="sweatingLocationType" value="Both whole body and specific areas">
+                    Both whole body and specific areas
+                </label>
+
+
+                <div id="specificSweatingLocationDetails" class="hidden">
+
+                    <h3>Which area?</h3>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Head / face">
+                        Head / face
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Chest">
+                        Chest
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Back">
+                        Back
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Hands">
+                        Hands
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Feet">
+                        Feet
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Palms and soles">
+                        Palms and soles
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Underarms">
+                        Underarms
+                    </label>
+
+                    <label>
+                        <input type="checkbox" class="specificSweatingLocation" value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+            // =================================================
+            // APPETITE
+            // =================================================
+
+            if (id === "appetite") {
+
+                return `
+
+                    <div class="section">
+
+                        <h2>Appetite</h2>
+
+
+                        <h3>1. Appetite</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="appetiteLevel"
+                                value="Normal"
+                            >
+                            Normal
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="appetiteLevel"
+                                value="Poor / reduced appetite"
+                            >
+                            Poor / reduced appetite
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="appetiteLevel"
+                                value="Increased appetite"
+                            >
+                            Increased appetite
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="appetiteLevel"
+                                value="No appetite"
+                            >
+                            No appetite
+                        </label>
+
+
+                        <h3>2. Meals per day</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="mealsPerDay"
+                                value="1 meal"
+                            >
+                            1 meal
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="mealsPerDay"
+                                value="2 meals"
+                            >
+                            2 meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="mealsPerDay"
+                                value="3 meals"
+                            >
+                            3 meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="mealsPerDay"
+                                value="4 meals"
+                            >
+                            4 meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="mealsPerDay"
+                                value="5+ meals"
+                            >
+                            5+ meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="mealsPerDay"
+                                value="Variable"
+                            >
+                            Variable
+                        </label>
+
+
+                        <h3>3. Typical food intake</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Rice / grains"
+                            >
+                            Rice / grains
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Meat"
+                            >
+                            Meat
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Fish / seafood"
+                            >
+                            Fish / seafood
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Vegetables"
+                            >
+                            Vegetables
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Fruits"
+                            >
+                            Fruits
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Dairy"
+                            >
+                            Dairy
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Eggs"
+                            >
+                            Eggs
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Fried / greasy foods"
+                            >
+                            Fried / greasy foods
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Spicy foods"
+                            >
+                            Spicy foods
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Sweets / sugary foods"
+                            >
+                            Sweets / sugary foods
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Cold / raw foods"
+                            >
+                            Cold / raw foods
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Processed / fast foods"
+                            >
+                            Processed / fast foods
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="typicalFood"
+                                value="Other"
+                            >
+                            Other
+                        </label>
+
+
+                        <h3>4. Food cravings</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="No particular craving"
+                            >
+                            No particular craving
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Sweet"
+                            >
+                            Sweet
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Sour"
+                            >
+                            Sour
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Spicy"
+                            >
+                            Spicy
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Salty"
+                            >
+                            Salty
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Bitter"
+                            >
+                            Bitter
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Cold foods / drinks"
+                            >
+                            Cold foods / drinks
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Hot foods / drinks"
+                            >
+                            Hot foods / drinks
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Meat"
+                            >
+                            Meat
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="foodCraving"
+                                value="Other"
+                            >
+                            Other
+                        </label>
+
+
+                        <h3>5. Eating habits</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="eatingHabit"
+                                value="Regular meals"
+                            >
+                            Regular meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="eatingHabit"
+                                value="Irregular meals"
+                            >
+                            Irregular meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="eatingHabit"
+                                value="Skips meals"
+                            >
+                            Skips meals
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="eatingHabit"
+                                value="Eats quickly"
+                            >
+                            Eats quickly
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="eatingHabit"
+                                value="Late-night eating"
+                            >
+                            Late-night eating
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="eatingHabit"
+                                value="Frequent snacking"
+                            >
+                            Frequent snacking
+                        </label>
+
+
+                        <h3>6. Other relevant details</h3>
+
+                        <textarea
+                            id="appetiteNotes"
+                            rows="3"
+                            placeholder="Record any other relevant appetite or eating information."
+                        ></textarea>
+
+                    </div>
+
+                `;
+
+            }
+
+
+
+            // =================================================
+            // THIRST
+            // =================================================
+
+            if (id === "thirst") {
+
+                return `
+
+                    <div class="section">
+
+                        <h2>Thirst</h2>
+
+
+                        <h3>1. Thirst</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="thirstLevel"
+                                value="No thirst"
+                            >
+                            No thirst
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="thirstLevel"
+                                value="Thirst"
+                            >
+                            Thirst
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="thirstLevel"
+                                value="Strong thirst"
+                            >
+                            Strong thirst
+                        </label>
+
+
+                        <h3>2. Daily fluid intake</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="fluidIntake"
+                                value="Less than 0.5 L/day"
+                            >
+                            Less than 0.5 L/day
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="fluidIntake"
+                                value="0.5–1 L/day"
+                            >
+                            0.5–1 L/day
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="fluidIntake"
+                                value="1–1.5 L/day"
+                            >
+                            1–1.5 L/day
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="fluidIntake"
+                                value="1.5–2 L/day"
+                            >
+                            1.5–2 L/day
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="fluidIntake"
+                                value="More than 2 L/day"
+                            >
+                            More than 2 L/day
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="fluidIntake"
+                                value="Unknown"
+                            >
+                            Unknown
+                        </label>
+
+
+                        <h3>3. Drinking preference</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="drinkingPreference"
+                                value="Cold drinks"
+                            >
+                            Cold drinks
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="drinkingPreference"
+                                value="Warm / hot drinks"
+                            >
+                            Warm / hot drinks
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="drinkingPreference"
+                                value="No preference"
+                            >
+                            No preference
+                        </label>
+
+
+                        <h3>4. Thirst characteristics</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="thirstCharacteristic"
+                                value="Dry mouth / dry throat"
+                            >
+                            Dry mouth / dry throat
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="thirstCharacteristic"
+                                value="Thirst but does not want to drink"
+                            >
+                            Thirst but does not want to drink
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="thirstCharacteristic"
+                                value="Wants to drink but can only take small amounts"
+                            >
+                            Wants to drink but can only take small amounts
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="thirstCharacteristic"
+                                value="Drinks a lot but thirst is not relieved"
+                            >
+                            Drinks a lot but thirst is not relieved
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="thirstCharacteristic"
+                                value="Thirst mainly at night"
+                            >
+                            Thirst mainly at night
+                        </label>
+
+
+                        <h3>5. Other relevant details</h3>
+
+                        <textarea
+                            id="thirstNotes"
+                            rows="3"
+                            placeholder="Record any other relevant thirst information."
+                        ></textarea>
+
+                    </div>
+
+                `;
+
+            }
+
+
+
+            // =================================================
+            // URINATION
+            // =================================================
+
+            if (id === "urination") {
+
+                return `
+
+                    <div class="section">
+
+                        <h2>Urination</h2>
+
+
+                        <h3>Daytime urination</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationDaytime"
+                                value="1–3 times"
+                            >
+                            1–3 times
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationDaytime"
+                                value="4–6 times"
+                            >
+                            4–6 times
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationDaytime"
+                                value="7–9 times"
+                            >
+                            7–9 times
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationDaytime"
+                                value="10+ times"
+                            >
+                            10+ times
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationDaytime"
+                                value="Unknown"
+                            >
+                            Unknown
+                        </label>
+
+
+                        <h3>Nighttime urination / Nocturia</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationNighttime"
+                                value="None"
+                            >
+                            None
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationNighttime"
+                                value="1 time"
+                            >
+                            1 time
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationNighttime"
+                                value="2 times"
+                            >
+                            2 times
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urinationNighttime"
+                                value="3+ times"
+                            >
+                            3+ times
+                        </label>
+
+
+                        <h3>Urine color</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineColor"
+                                value="Pale / clear"
+                            >
+                            Pale / clear
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineColor"
+                                value="Light yellow"
+                            >
+                            Light yellow
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineColor"
+                                value="Dark yellow"
+                            >
+                            Dark yellow
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineColor"
+                                value="Deep yellow"
+                            >
+                            Deep yellow
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineColor"
+                                value="Red / bloody"
+                            >
+                            Red / bloody
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineColor"
+                                value="Cloudy"
+                            >
+                            Cloudy
+                        </label>
+
+
+                        <h3>Urine amount</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineAmount"
+                                value="Normal"
+                            >
+                            Normal
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineAmount"
+                                value="Large"
+                            >
+                            Large
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineAmount"
+                                value="Small"
+                            >
+                            Small
+                        </label>
+
+
+                        <h3>Urine odor</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineOdor"
+                                value="Normal"
+                            >
+                            Normal
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="urineOdor"
+                                value="Strong / unusual odor"
+                            >
+                            Strong / unusual odor
+                        </label>
+
+
+                        <h3>Urination symptoms</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Urgency"
+                            >
+                            Urgency
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Hesitancy / difficulty starting"
+                            >
+                            Hesitancy / difficulty starting
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Weak stream"
+                            >
+                            Weak stream
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Dribbling"
+                            >
+                            Dribbling
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Incomplete emptying"
+                            >
+                            Incomplete emptying
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Burning / painful urination"
+                            >
+                            Burning / painful urination
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="urinationSymptom"
+                                value="Urinary leakage"
+                            >
+                            Urinary leakage
+                        </label>
+
+
+                        <label for="urinationNotes">
+                            Other relevant details
+                        </label>
+
+                        <textarea
+                            id="urinationNotes"
+                            rows="3"
+                            placeholder="Record any other relevant urinary information."
+                        ></textarea>
+
+                    </div>
+
+                `;
+
+            }
+
+
+
+            // =================================================
+            // BOWEL MOVEMENT
+            // =================================================
+
+            if (id === "bowelMovement") {
+
+                return `
+
+                    <div class="section">
+
+                        <h2>Bowel Movement</h2>
+
+
+                        <h3>Frequency</h3>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="bowelFrequency"
+                                value="Daily"
+                            >
+                            Daily
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="bowelFrequency"
+                                value="Every 2–3 days"
+                            >
+                            Every 2–3 days
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="bowelFrequency"
+                                value="Less than 2 times/week"
+                            >
+                            Less than 2 times/week
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="bowelFrequency"
+                                value="More than once daily"
+                            >
+                            More than once daily
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="bowelFrequency"
+                                value="Variable"
+                            >
+                            Variable
+                        </label>
+
+
+                        <h3>Stool consistency</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Formed"
+                            >
+                            Formed
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Loose"
+                            >
+                            Loose
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Watery"
+                            >
+                            Watery
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Hard"
+                            >
+                            Hard
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Dry"
+                            >
+                            Dry
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Sticky"
+                            >
+                            Sticky
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolConsistency"
+                                value="Alternating loose and hard"
+                            >
+                            Alternating loose and hard
+                        </label>
+
+
+                        <h3>Difficulty</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="bowelDifficulty"
+                                value="Easy to pass"
+                            >
+                            Easy to pass
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="bowelDifficulty"
+                                value="Straining"
+                            >
+                            Straining
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="bowelDifficulty"
+                                value="Feeling of incomplete evacuation"
+                            >
+                            Feeling of incomplete evacuation
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="bowelDifficulty"
+                                value="Urgency"
+                            >
+                            Urgency
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="bowelDifficulty"
+                                value="Unable to hold stool"
+                            >
+                            Unable to hold stool
+                        </label>
+
+
+                        <h3>Stool characteristics</h3>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Normal brown"
+                            >
+                            Normal brown
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Very dark / black"
+                            >
+                            Very dark / black
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Pale / light-colored"
+                            >
+                            Pale / light-colored
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Mucus"
+                            >
+                            Mucus
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Blood"
+                            >
+                            Blood
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Undigested food"
+                            >
+                            Undigested food
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="stoolCharacteristics"
+                                value="Very foul odor"
+                            >
+                            Very foul odor
+                        </label>
+
+
+                        <label for="bowelNotes">
+                            Other relevant details
+                        </label>
+
+                        <textarea
+                            id="bowelNotes"
+                            rows="3"
+                            placeholder="Record any other relevant bowel information."
+                        ></textarea>
+
+                    </div>
+
+                `;
+
+            }
+            // =================================================
+            // chest/abdomen
+            // =================================================
+
+    if (id === "chestAbdomen") {
+    return `
+        <div class="section">
+            <h2>Chest / Abdomen</h2>
+
+            <div class="question-group">
+                <label>Do you have any unusual symptoms in your chest or abdomen?</label>
+
+                <label>
+                    <input type="radio"
+                           name="chestAbdomenPresence"
+                           value="No">
+                    No
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="chestAbdomenPresence"
+                           value="Yes">
+                    Yes
+                </label>
+            </div>
+
+            <div id="chestAbdomenDetails" class="hidden">
+
+                <!-- Location -->
+                <div class="question-group">
+                    <label>Where do you have symptoms?</label>
+
+                    <label>
+                        <input type="radio"
+                               name="chestAbdomenLocation"
+                               value="Chest">
+                        Chest
+                    </label>
+
+                    <label>
+                        <input type="radio"
+                               name="chestAbdomenLocation"
+                               value="Abdomen">
+                        Abdomen
+                    </label>
+
+                    <label>
+                        <input type="radio"
+                               name="chestAbdomenLocation"
+                               value="Both chest and abdomen">
+                        Both chest and abdomen
+                    </label>
+                </div>
+
+                <!-- Chest -->
+                <div id="chestDetails" class="hidden">
+
+                    <div class="question-group">
+                        <label>What do you experience in your chest?</label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="Chest pain or discomfort">
+                            Chest pain or discomfort
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="Chest tightness">
+                            Chest tightness
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="A feeling of fullness or pressure">
+                            A feeling of fullness or pressure
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="Palpitations">
+                            Palpitations
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="Shortness of breath">
+                            Shortness of breath
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="A sensation of something stuck in the chest">
+                            A sensation of something stuck in the chest
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="Cough">
+                            Cough
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestSymptoms"
+                                   value="Other">
+                            Other
+                        </label>
+                    </div>
+
+                    <!-- Chest pain quality -->
+                    <div id="chestPainQualityDetails" class="question-group hidden">
+
+                        <label>What does the chest discomfort feel like?</label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestPainQuality"
+                                   value="Dull / aching">
+                            Dull / aching
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestPainQuality"
+                                   value="Sharp / stabbing">
+                            Sharp / stabbing
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestPainQuality"
+                                   value="Tight / squeezing">
+                            Tight / squeezing
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestPainQuality"
+                                   value="Heavy / pressing">
+                            Heavy / pressing
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestPainQuality"
+                                   value="Burning">
+                            Burning
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="chestPainQuality"
+                                   value="Other">
+                            Other
+                        </label>
+                    </div>
+
+                </div>
+
+                <!-- Abdomen -->
+                <div id="abdomenDetails" class="hidden">
+
+                    <div class="question-group">
+                        <label>What symptoms do you experience in your abdomen?</label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Abdominal pain or discomfort">
+                            Abdominal pain or discomfort
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Bloating / distension">
+                            Bloating / distension
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Fullness">
+                            Fullness
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Gurgling sounds">
+                            Gurgling sounds
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Nausea">
+                            Nausea
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Vomiting">
+                            Vomiting
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Acid reflux / heartburn">
+                            Acid reflux / heartburn
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Belching">
+                            Belching
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Hiccups">
+                            Hiccups
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Feeling of a lump or mass">
+                            Feeling of a lump or mass
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="abdominalSymptoms"
+                                   value="Other">
+                            Other
+                        </label>
+                    </div>
+
+                    <!-- Abdominal pain: warmth -->
+                    <div id="abdominalWarmthDetails" class="question-group hidden">
+
+                        <label>Does your abdominal discomfort feel better or worse with warmth?</label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalWarmth"
+                                   value="Better with warmth">
+                            Better with warmth
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalWarmth"
+                                   value="Worse with warmth">
+                            Worse with warmth
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalWarmth"
+                                   value="No clear effect">
+                            No clear effect
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalWarmth"
+                                   value="I do not notice any difference">
+                            I do not notice any difference
+                        </label>
+                    </div>
+
+                    <!-- Abdominal pain: pressure -->
+                    <div id="abdominalPressureDetails" class="question-group hidden">
+
+                        <label>Does pressing the abdomen make it feel better or worse?</label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalPressure"
+                                   value="Better with pressure">
+                            Better with pressure
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalPressure"
+                                   value="Worse with pressure">
+                            Worse with pressure
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalPressure"
+                                   value="No clear effect">
+                            No clear effect
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="abdominalPressure"
+                                   value="I do not notice any difference">
+                            I do not notice any difference
+                        </label>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+
+            // =================================================
+            // SLEEP
+            // =================================================
+
+            if (id === "sleep") {
+
+                return `
+
+                    <div class="section">
+
+                        <h2>Sleep</h2>
+
+
+                        <label for="sleepDuration">
+                            Sleep duration
+                        </label>
+
+                        <select id="sleepDuration">
+
+                            <option value="">
+                                Please select
+                            </option>
+
+                            <option value="Less than 4 hours">
+                                Less than 4 hours
+                            </option>
+
+                            <option value="4–5 hours">
+                                4–5 hours
+                            </option>
+
+                            <option value="5–6 hours">
+                                5–6 hours
+                            </option>
+
+                            <option value="6–7 hours">
+                                6–7 hours
+                            </option>
+
+                            <option value="7–8 hours">
+                                7–8 hours
+                            </option>
+
+                            <option value="More than 8 hours">
+                                More than 8 hours
+                            </option>
+
+                        </select>
+
+
+                        <h3>Sleep difficulty</h3>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Difficulty falling asleep"
+                            >
+                            Difficulty falling asleep
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Difficulty falling back asleep after waking"
+                            >
+                            Difficulty falling back asleep after waking
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Frequent waking"
+                            >
+                            Frequent waking
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Early morning awakening"
+                            >
+                            Early morning awakening
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Dream-disturbed sleep"
+                            >
+                            Dream-disturbed sleep
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Light / easily disturbed sleep"
+                            >
+                            Light / easily disturbed sleep
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Night sweating"
+                            >
+                            Night sweating
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepDifficulty"
+                                value="Restless sleep"
+                            >
+                            Restless sleep
+                        </label>
+
+
+                        <div
+                            id="sleepReturnDetails"
+                            class="hidden"
+                        >
+
+                            <h3>Returning to sleep</h3>
+
+                            <label for="returnToSleepDuration">
+
+                                Approximately how long does it take
+                                to fall asleep again?
+
+                            </label>
+
+
+                            <select id="returnToSleepDuration">
+
+                                <option value="">
+                                    Please select
+                                </option>
+
+                                <option value="Less than 5 minutes">
+                                    Less than 5 minutes
+                                </option>
+
+                                <option value="5–15 minutes">
+                                    5–15 minutes
+                                </option>
+
+                                <option value="15–30 minutes">
+                                    15–30 minutes
+                                </option>
+
+                                <option value="30–60 minutes">
+                                    30–60 minutes
+                                </option>
+
+                                <option value="More than 60 minutes">
+                                    More than 60 minutes
+                                </option>
+
+                                <option value="Unable to fall back asleep">
+                                    Unable to fall back asleep
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <h3>Other sleep-related symptoms</h3>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepOther"
+                                value="Nightmares"
+                            >
+                            Nightmares
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepOther"
+                                value="Snoring"
+                            >
+                            Snoring
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepOther"
+                                value="Sleep apnea / breathing interruption"
+                            >
+                            Sleep apnea / breathing interruption
+                        </label>
+
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="sleepOther"
+                                value="Restless legs"
+                            >
+                            Restless legs
+                        </label>
+
+
+                        <label for="sleepNotes">
+                            Other relevant details
+                        </label>
+
+                        <textarea
+                            id="sleepNotes"
+                            rows="3"
+                            placeholder="Record any other relevant sleep information."
+                        ></textarea>
+
+                    </div>
+
+                `;
+
+            }
+
+if (id === "headBody") {
+    return `
+        <div class="section">
+            <h2>Head / Body</h2>
+
+            <!-- Q1: Presence of symptoms -->
+            <div class="question-group">
+                <label>Do you have any unusual symptoms in your head or body?</label>
+
+                <label>
+                    <input type="radio"
+                           name="headBodyPresence"
+                           value="No">
+                    No
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="headBodyPresence"
+                           value="Yes">
+                    Yes
+                </label>
+            </div>
+
+            <div id="headBodyDetails" class="hidden">
+
+                <!-- Q2: Head symptoms -->
+                <div class="question-group">
+                    <label>Head symptoms</label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Headache">
+                        Headache
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Dizziness">
+                        Dizziness
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Lightheadedness">
+                        Lightheadedness
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Heaviness of the head">
+                        Heaviness of the head
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Feeling of pressure in the head">
+                        Feeling of pressure in the head
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Numbness or tingling of the head or face">
+                        Numbness or tingling of the head or face
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Trembling or shaking of the head">
+                        Trembling or shaking of the head
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headSymptoms"
+                               value="Other head symptom">
+                        Other
+                    </label>
+                </div>
+
+                <!-- Headache details -->
+                <div id="headacheDetails" class="hidden">
+
+                    <div class="question-group">
+                        <label>What does your headache feel like?</label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Dull / aching">
+                            Dull / aching
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Sharp / stabbing">
+                            Sharp / stabbing
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Throbbing">
+                            Throbbing
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Heavy / pressure-like">
+                            Heavy / pressure-like
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Tight / constricting">
+                            Tight / constricting
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Burning">
+                            Burning
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheQuality"
+                                   value="Other">
+                            Other
+                        </label>
+                    </div>
+
+                    <div class="question-group">
+                        <label>Where do you usually feel the headache?</label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Top of the head">
+                            Top of the head
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Occipital region / back of the head">
+                            Occipital region / back of the head
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Temple region">
+                            Temple region
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Forehead">
+                            Forehead
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Behind the eyes">
+                            Behind the eyes
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Side of the head">
+                            Side of the head
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Behind the ears">
+                            Behind the ears
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="TMJ region">
+                            TMJ region
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Whole head">
+                            Whole head
+                        </label>
+
+                        <label>
+                            <input type="checkbox"
+                                   class="headacheLocation"
+                                   value="Other">
+                            Other
+                        </label>
+                    </div>
+
+                </div>
+
+                <!-- Dizziness details -->
+                <div id="dizzinessDetails" class="question-group hidden">
+
+                    <label>How would you describe your dizziness?</label>
+
+                    <label>
+                        <input type="radio"
+                               name="dizzinessType"
+                               value="Spinning / room is moving">
+                        Spinning / room is moving
+                    </label>
+
+                    <label>
+                        <input type="radio"
+                               name="dizzinessType"
+                               value="Lightheaded / feeling faint">
+                        Lightheaded / feeling faint
+                    </label>
+
+                    <label>
+                        <input type="radio"
+                               name="dizzinessType"
+                               value="Unsteady / off balance">
+                        Unsteady / off balance
+                    </label>
+
+                    <label>
+                        <input type="radio"
+                               name="dizzinessType"
+                               value="Heavy-headed">
+                        Heavy-headed
+                    </label>
+
+                    <label>
+                        <input type="radio"
+                               name="dizzinessType"
+                               value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+                <!-- Head / face numbness details -->
+                <div id="headFaceNumbnessDetails" class="question-group hidden">
+
+                    <label>Where do you experience numbness or tingling?</label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Scalp">
+                        Scalp
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Forehead">
+                        Forehead
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Around the eyes">
+                        Around the eyes
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Cheeks">
+                        Cheeks
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Lips / around the mouth">
+                        Lips / around the mouth
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Jaw / TMJ region">
+                        Jaw / TMJ region
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="One side of the face">
+                        One side of the face
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Both sides of the face">
+                        Both sides of the face
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="headFaceNumbnessLocation"
+                               value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+                <!-- Body symptoms -->
+                <div class="question-group">
+                    <label>Body symptoms</label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Generalized body aches">
+                        Generalized body aches
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Body heaviness">
+                        Body heaviness
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Fatigue / weakness">
+                        Fatigue / weakness
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Numbness or tingling">
+                        Numbness or tingling
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Muscle stiffness or tightness">
+                        Muscle stiffness or tightness
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Trembling / shaking">
+                        Trembling / shaking
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Swelling / edema">
+                        Swelling / edema
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodySymptoms"
+                               value="Other body symptom">
+                        Other
+                    </label>
+                </div>
+
+                <!-- Body numbness details -->
+                <div id="bodyNumbnessDetails" class="question-group hidden">
+
+                    <label>Where do you experience numbness or tingling?</label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Arms">
+                        Arms
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Hands">
+                        Hands
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Legs">
+                        Legs
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Feet">
+                        Feet
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Back">
+                        Back
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Chest">
+                        Chest
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Abdomen">
+                        Abdomen
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Whole body">
+                        Whole body
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="bodyNumbnessLocation"
+                               value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+                <!-- Muscle stiffness details -->
+                <div id="muscleStiffnessDetails" class="question-group hidden">
+
+                    <label>Where do you experience muscle stiffness or tightness?</label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Neck">
+                        Neck
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Shoulders">
+                        Shoulders
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Upper back">
+                        Upper back
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Lower back">
+                        Lower back
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Arms">
+                        Arms
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Legs">
+                        Legs
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Whole body">
+                        Whole body
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="muscleStiffnessLocation"
+                               value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+                <!-- Swelling details -->
+                <div id="swellingDetails" class="question-group hidden">
+
+                    <label>Where do you notice the swelling?</label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Face">
+                        Face
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Hands">
+                        Hands
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Arms">
+                        Arms
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Legs">
+                        Legs
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Feet / ankles">
+                        Feet / ankles
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Around the eyes">
+                        Around the eyes
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Whole body">
+                        Whole body
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="swellingLocation"
+                               value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+if (id === "earEyes") {
+    return `
+        <div class="section">
+            <h2>Ear / Eyes</h2>
+
+            <div class="question-group">
+                <label>
+                    Do you have any unusual symptoms involving your ears or eyes?
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="earEyesPresence"
+                           value="No">
+                    No
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="earEyesPresence"
+                           value="Yes">
+                    Yes
+                </label>
+            </div>
+
+            <div id="earEyesDetails" class="hidden">
+
+                <div class="question-group">
+                    <label>
+                        What symptoms do you experience in your ears?
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Hearing loss / reduced hearing">
+                        Hearing loss / reduced hearing
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Ringing in the ears (tinnitus)">
+                        Ringing in the ears (tinnitus)
+                    </label>
+                    <div id="tinnitusDetails" class="question-group hidden">
+
+    <label>
+        What type of tinnitus do you usually experience?
+    </label>
+
+    <label>
+        <input type="radio"
+               name="tinnitusType"
+               value="High-pitched">
+        High-pitched
+    </label>
+
+    <label>
+        <input type="radio"
+               name="tinnitusType"
+               value="Low-pitched">
+        Low-pitched
+    </label>
+
+</div>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Ear pain">
+                        Ear pain
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Ear fullness / pressure">
+                        Ear fullness / pressure
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Ear discharge">
+                        Ear discharge
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Ear itching">
+                        Ear itching
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="earSymptoms"
+                               value="Other ear symptom">
+                        Other
+                    </label>
+                </div>
+
+                <div class="question-group">
+                    <label>
+                        What symptoms do you experience in your eyes?
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Blurred vision">
+                        Blurred vision
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Reduced vision">
+                        Reduced vision
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Dry eyes">
+                        Dry eyes
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Watery eyes">
+                        Watery eyes
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Eye redness">
+                        Eye redness
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Eye pain">
+                        Eye pain
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Eye itching">
+                        Eye itching
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Eye swelling">
+                        Eye swelling
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Floaters / spots in vision">
+                        Floaters / spots in vision
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Light sensitivity">
+                        Light sensitivity
+                    </label>
+
+                    <label>
+                        <input type="checkbox"
+                               class="eyeSymptoms"
+                               value="Other eye symptom">
+                        Other
+                    </label>
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+if (id === "emotion") {
+    return `
+        <div class="section">
+            <h2>Emotion</h2>
+
+            <div class="question-group">
+                <label>
+                    How would you describe your emotional state recently?
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Generally calm / emotionally stable">
+                    Generally calm / emotionally stable
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Easily irritated or angry">
+                    Easily irritated or angry
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Anxious or worried">
+                    Anxious or worried
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Sad or low mood">
+                    Sad or low mood
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Fearful or easily frightened">
+                    Fearful or easily frightened
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Easily startled">
+                    Easily startled
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Restless / unable to relax">
+                    Restless / unable to relax
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Frequent mood changes">
+                    Frequent mood changes
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="emotionState"
+                           value="Other">
+                    Other
+                </label>
+            </div>
+
+            <div class="question-group">
+                <label>
+                    Do your emotional states tend to trigger or worsen any of your physical symptoms?
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="emotionPhysicalEffect"
+                           value="Yes">
+                    Yes
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="emotionPhysicalEffect"
+                           value="No">
+                    No
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="emotionPhysicalEffect"
+                           value="Not sure">
+                    Not sure
+                </label>
+            </div>
+
+            <div id="emotionPhysicalEffectDetails"
+                 class="question-group hidden">
+
+                <label>
+                    Please describe which symptoms are triggered or worsened by emotional stress.
+                </label>
+
+                <textarea
+                    id="emotionPhysicalEffectNotes"
+                    placeholder="Please describe..."></textarea>
+
+            </div>
+        </div>
+    `;
+}
+
+            // =================================================
+            // ORDINARY TEXT SECTIONS
+            // =================================================
+
+            return `
+
+                <div class="section">
+
+                    <h2>${title}</h2>
+
+                    <label for="${id}">
+                        Relevant details
+                    </label>
+
+                    <textarea
+                        id="${id}"
+                        rows="3"
+                        placeholder="Record the patient's relevant symptoms or state none."
+                    ></textarea>
+
+                </div>
+
+            `;
+
+
+        }).join("");
+
+
+
+    // =====================================================
+    // LOAD PATIENT INFORMATION
+    // =====================================================
+
+    const patient =
+        JSON.parse(
+            localStorage.getItem("patient") || "null"
+        );
+
+
+    if (patient) {
+
+        document.getElementById("patientName").textContent =
+            patient.firstName || "";
+
+
+        document.getElementById("patientAge").textContent =
+            patient.age || "";
+
+
+        document.getElementById("patientSex").textContent =
+            patient.sex || "";
+
+
+        document.getElementById("patientComplaint").textContent =
+            patient.chiefComplaint || "";
+
+    }
+
+
+
+    // =====================================================
+    // LOAD PREVIOUSLY SAVED DATA
+    // =====================================================
+
+    const savedGeneralInquiry =
+        JSON.parse(
+            localStorage.getItem("generalInquiry") || "null"
+        );
+
+
+    if (savedGeneralInquiry) {
+
+
+        // =================================================
+        // ORDINARY TEXT FIELDS
+        // =================================================
+
+    textFields.forEach(([id]) => {
+
+    if (
+        id !== "sleep" &&
+        id !== "urination" &&
+        id !== "bowelMovement" &&
+        id !== "appetite" &&
+        id !== "thirst" &&
+        id !== "chillsFever"
+    ) {
+
+        const element =
+            document.getElementById(id);
+
+        if (element) {
+
+            element.value =
+                savedGeneralInquiry[id] || "";
+
+        }
+
+    }
+
+});   
+
+        // =================================================
+        // CHILLS / FEVER
+        // =================================================
+
+        if (
+            savedGeneralInquiry.chillsFever &&
+            typeof savedGeneralInquiry.chillsFever === "object"
+        ) {
+
+            const chillsFever =
+                savedGeneralInquiry.chillsFever;
+
+
+            // ---------------------------------------------
+            // Usual temperature sensation
+            // ---------------------------------------------
+
+            document
+                .querySelectorAll(
+                    'input[name="temperatureSensation"]'
+                )
+                .forEach(radio => {
+
+                    radio.checked =
+                        radio.value ===
+                        (chillsFever.temperatureSensation || "");
+
+                });
+
+
+            // ---------------------------------------------
+            // Cold characteristics
+            // ---------------------------------------------
+
+            document
+                .querySelectorAll(".coldCharacteristic")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        Array.isArray(
+                            chillsFever.coldCharacteristics
+                        ) &&
+                        chillsFever.coldCharacteristics.includes(
+                            checkbox.value
+                        );
+
+                });
+
+
+            // ---------------------------------------------
+            // Hot characteristics
+            // ---------------------------------------------
+
+            document
+                .querySelectorAll(".hotCharacteristic")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        Array.isArray(
+                            chillsFever.hotCharacteristics
+                        ) &&
+                        chillsFever.hotCharacteristics.includes(
+                            checkbox.value
+                        );
+
+                });
+
+
+            // ---------------------------------------------
+            // Fever status
+            // ---------------------------------------------
+
+            document
+                .querySelectorAll(
+                    'input[name="feverStatus"]'
+                )
+                .forEach(radio => {
+
+                    radio.checked =
+                        radio.value ===
+                        (chillsFever.feverStatus || "");
+
+                });
+
+
+            // ---------------------------------------------
+            // Measured temperature
+            // ---------------------------------------------
+
+            const highestTemperature =
+                document.getElementById(
+                    "highestTemperature"
+                );
+
+            if (highestTemperature) {
+
+                highestTemperature.value =
+                    chillsFever.highestTemperature || "";
+
+            }
+
+
+            // ---------------------------------------------
+            // Temperature measurement method
+            // ---------------------------------------------
+
+            const temperatureMethod =
+                document.getElementById(
+                    "temperatureMethod"
+                );
+
+            if (temperatureMethod) {
+
+                temperatureMethod.value =
+                    chillsFever.temperatureMethod || "";
+
+            }
+
+
+            // ---------------------------------------------
+            // Fever timing
+            // ---------------------------------------------
+
+            const feverTiming =
+                document.getElementById(
+                    "feverTiming"
+                );
+
+            if (feverTiming) {
+
+                feverTiming.value =
+                    chillsFever.feverTiming || "";
+
+            }
+
+
+            // ---------------------------------------------
+            // Associated symptoms
+            // ---------------------------------------------
+
+            document
+                .querySelectorAll(
+                    ".chillsFeverAssociated"
+                )
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        Array.isArray(
+                            chillsFever.associatedSymptoms
+                        ) &&
+                        chillsFever.associatedSymptoms.includes(
+                            checkbox.value
+                        );
+
+                });
+
+
+            // ---------------------------------------------
+            // Other notes
+            // ---------------------------------------------
+
+            const chillsFeverNotes =
+                document.getElementById(
+                    "chillsFeverNotes"
+                );
+
+            if (chillsFeverNotes) {
+
+                chillsFeverNotes.value =
+                    chillsFever.notes || "";
+
+            }
+
+
+            // ---------------------------------------------
+            // Restore dynamic sections
+            // ---------------------------------------------
+
+            updateTemperatureQuestions();
+
+            updateFeverDetails();
+
+        }
+
+if (
+    savedGeneralInquiry.sweating &&
+    typeof savedGeneralInquiry.sweating === "object"
+) {
+    const sweating = savedGeneralInquiry.sweating;
+
+    // 1. Do you sweat easily?
+    document.querySelectorAll('input[name="sweatingEase"]').forEach(radio => {
+        radio.checked = radio.value === (sweating.ease || "");
+    });
+
+    // 2. When do you usually sweat easily?
+    document.querySelectorAll(".sweatingTiming").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(sweating.timing) &&
+            sweating.timing.includes(checkbox.value);
+    });
+
+    // 3. When does spontaneous sweating usually occur?
+    document.querySelectorAll(
+        'input[name="spontaneousSweatingTime"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (sweating.spontaneousSweatingTime || "");
+    });
+
+    // 4. How much do you usually sweat?
+    document.querySelectorAll('input[name="sweatingAmount"]').forEach(radio => {
+        radio.checked = radio.value === (sweating.amount || "");
+    });
+
+    // 5. Where do you usually sweat?
+    document.querySelectorAll(
+        'input[name="sweatingLocationType"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (sweating.locationType || "");
+    });
+
+    // Specific sweating locations
+    document.querySelectorAll(".specificSweatingLocation").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(sweating.specificLocations) &&
+            sweating.specificLocations.includes(checkbox.value);
+    });
+
+    // Restore the correct sections
+    updateSweatingQuestions();
+}
+
+        // =================================================
+        // APPETITE
+        // =================================================
+
+        if (savedGeneralInquiry.appetite) {
+
+            const appetite =
+                savedGeneralInquiry.appetite;
+
+
+            const level =
+                document.querySelector(
+                    `input[name="appetiteLevel"][value="${CSS.escape(appetite.level || "")}"]`
+                );
+
+
+            if (level) {
+                level.checked = true;
+            }
+
+
+            const meals =
+                document.querySelector(
+                    `input[name="mealsPerDay"][value="${CSS.escape(appetite.mealsPerDay || "")}"]`
+                );
+
+
+            if (meals) {
+                meals.checked = true;
+            }
+
+
+            document
+                .querySelectorAll(".typicalFood")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (appetite.typicalFood || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document
+                .querySelectorAll(".foodCraving")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (appetite.foodCravings || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document
+                .querySelectorAll(".eatingHabit")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (appetite.eatingHabits || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document.getElementById(
+                "appetiteNotes"
+            ).value =
+                appetite.notes || "";
+
+        }
+
+
+
+        // =================================================
+        // THIRST
+        // =================================================
+
+        if (savedGeneralInquiry.thirst) {
+
+            const thirst =
+                savedGeneralInquiry.thirst;
+
+
+            const level =
+                document.querySelector(
+                    `input[name="thirstLevel"][value="${CSS.escape(thirst.level || "")}"]`
+                );
+
+
+            if (level) {
+                level.checked = true;
+            }
+
+
+            const fluid =
+                document.querySelector(
+                    `input[name="fluidIntake"][value="${CSS.escape(thirst.fluidIntake || "")}"]`
+                );
+
+
+            if (fluid) {
+                fluid.checked = true;
+            }
+
+
+            const preference =
+                document.querySelector(
+                    `input[name="drinkingPreference"][value="${CSS.escape(thirst.drinkingPreference || "")}"]`
+                );
+
+
+            if (preference) {
+                preference.checked = true;
+            }
+
+
+            document
+                .querySelectorAll(".thirstCharacteristic")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (thirst.characteristics || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document.getElementById(
+                "thirstNotes"
+            ).value =
+                thirst.notes || "";
+
+        }
+
+
+
+        // =================================================
+        // URINATION
+        // =================================================
+
+        if (savedGeneralInquiry.urination) {
+
+            const urination =
+                savedGeneralInquiry.urination;
+
+
+            const daytime =
+                document.querySelector(
+                    `input[name="urinationDaytime"][value="${CSS.escape(urination.daytime || "")}"]`
+                );
+
+
+            if (daytime) {
+                daytime.checked = true;
+            }
+
+
+            const nighttime =
+                document.querySelector(
+                    `input[name="urinationNighttime"][value="${CSS.escape(urination.nighttime || "")}"]`
+                );
+
+
+            if (nighttime) {
+                nighttime.checked = true;
+            }
+
+
+            const color =
+                document.querySelector(
+                    `input[name="urineColor"][value="${CSS.escape(urination.color || "")}"]`
+                );
+
+
+            if (color) {
+                color.checked = true;
+            }
+
+
+            const amount =
+                document.querySelector(
+                    `input[name="urineAmount"][value="${CSS.escape(urination.amount || "")}"]`
+                );
+
+
+            if (amount) {
+                amount.checked = true;
+            }
+
+
+            const odor =
+                document.querySelector(
+                    `input[name="urineOdor"][value="${CSS.escape(urination.odor || "")}"]`
+                );
+
+
+            if (odor) {
+                odor.checked = true;
+            }
+
+
+            document
+                .querySelectorAll(".urinationSymptom")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (urination.symptoms || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document.getElementById(
+                "urinationNotes"
+            ).value =
+                urination.notes || "";
+
+        }
+
+
+
+        // =================================================
+        // BOWEL MOVEMENT
+        // =================================================
+
+        if (savedGeneralInquiry.bowelMovement) {
+
+            const bowel =
+                savedGeneralInquiry.bowelMovement;
+
+
+            const frequency =
+                document.querySelector(
+                    `input[name="bowelFrequency"][value="${CSS.escape(bowel.frequency || "")}"]`
+                );
+
+
+            if (frequency) {
+                frequency.checked = true;
+            }
+
+
+            document
+                .querySelectorAll(".stoolConsistency")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (bowel.consistency || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document
+                .querySelectorAll(".bowelDifficulty")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (bowel.difficulty || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document
+                .querySelectorAll(".stoolCharacteristics")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (bowel.characteristics || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document.getElementById(
+                "bowelNotes"
+            ).value =
+                bowel.notes || "";
+
+        }
+
+if (
+    savedGeneralInquiry.chestAbdomen &&
+    typeof savedGeneralInquiry.chestAbdomen === "object"
+) {
+    const chestAbdomen = savedGeneralInquiry.chestAbdomen;
+
+    // Q1: Yes / No
+    document.querySelectorAll(
+        'input[name="chestAbdomenPresence"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (chestAbdomen.presence || "");
+    });
+
+    // Q2: Chest / Abdomen / Both
+    document.querySelectorAll(
+        'input[name="chestAbdomenLocation"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (chestAbdomen.location || "");
+    });
+
+    // Chest symptoms
+    document.querySelectorAll(".chestSymptoms").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(chestAbdomen.chestSymptoms) &&
+            chestAbdomen.chestSymptoms.includes(checkbox.value);
+    });
+
+    // Chest pain quality
+    document.querySelectorAll(".chestPainQuality").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(chestAbdomen.chestPainQuality) &&
+            chestAbdomen.chestPainQuality.includes(checkbox.value);
+    });
+
+    // Abdominal symptoms
+    document.querySelectorAll(".abdominalSymptoms").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(chestAbdomen.abdominalSymptoms) &&
+            chestAbdomen.abdominalSymptoms.includes(checkbox.value);
+    });
+
+    // Abdominal warmth
+    document.querySelectorAll(
+        'input[name="abdominalWarmth"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (chestAbdomen.abdominalWarmth || "");
+    });
+
+    // Abdominal pressure
+    document.querySelectorAll(
+        'input[name="abdominalPressure"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (chestAbdomen.abdominalPressure || "");
+    });
+
+    // Re-open the correct follow-up questions
+    updateChestAbdomenQuestions();
+}
+if (
+    savedGeneralInquiry.headBody &&
+    typeof savedGeneralInquiry.headBody === "object"
+) {
+    const headBody = savedGeneralInquiry.headBody;
+
+    // Q1: Yes / No
+    document.querySelectorAll(
+        'input[name="headBodyPresence"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (headBody.presence || "");
+    });
+
+    // Head symptoms
+    document.querySelectorAll(".headSymptoms").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.headSymptoms) &&
+            headBody.headSymptoms.includes(checkbox.value);
+    });
+
+    // Headache quality
+    document.querySelectorAll(".headacheQuality").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.headacheQuality) &&
+            headBody.headacheQuality.includes(checkbox.value);
+    });
+
+    // Headache location
+    document.querySelectorAll(".headacheLocation").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.headacheLocation) &&
+            headBody.headacheLocation.includes(checkbox.value);
+    });
+
+    // Dizziness type
+    document.querySelectorAll(
+        'input[name="dizzinessType"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (headBody.dizzinessType || "");
+    });
+
+    // Head / face numbness location
+    document.querySelectorAll(
+        ".headFaceNumbnessLocation"
+    ).forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.headFaceNumbnessLocation) &&
+            headBody.headFaceNumbnessLocation.includes(checkbox.value);
+    });
+
+    // Body symptoms
+    document.querySelectorAll(".bodySymptoms").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.bodySymptoms) &&
+            headBody.bodySymptoms.includes(checkbox.value);
+    });
+
+    // Body numbness location
+    document.querySelectorAll(
+        ".bodyNumbnessLocation"
+    ).forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.bodyNumbnessLocation) &&
+            headBody.bodyNumbnessLocation.includes(checkbox.value);
+    });
+
+    // Muscle stiffness location
+    document.querySelectorAll(
+        ".muscleStiffnessLocation"
+    ).forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.muscleStiffnessLocation) &&
+            headBody.muscleStiffnessLocation.includes(checkbox.value);
+    });
+
+    // Swelling location
+    document.querySelectorAll(
+        ".swellingLocation"
+    ).forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(headBody.swellingLocation) &&
+            headBody.swellingLocation.includes(checkbox.value);
+    });
+
+    // Re-open the correct follow-up questions
+    updateHeadBodyQuestions();
+}
+if (
+    savedGeneralInquiry.earEyes &&
+    typeof savedGeneralInquiry.earEyes === "object"
+) {
+    const earEyes = savedGeneralInquiry.earEyes;
+
+    // Q1: Yes / No
+    document.querySelectorAll(
+        'input[name="earEyesPresence"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (earEyes.presence || "");
+    });
+
+    // Ear symptoms
+    document.querySelectorAll(".earSymptoms").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(earEyes.earSymptoms) &&
+            earEyes.earSymptoms.includes(checkbox.value);
+    });
+
+    // Tinnitus type
+    document.querySelectorAll(
+        'input[name="tinnitusType"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (earEyes.tinnitusType || "");
+    });
+
+    // Eye symptoms
+    document.querySelectorAll(".eyeSymptoms").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(earEyes.eyeSymptoms) &&
+            earEyes.eyeSymptoms.includes(checkbox.value);
+    });
+
+    // Re-open the correct follow-up questions
+    updateEarEyesQuestions();
+}
+if (
+    savedGeneralInquiry.emotion &&
+    typeof savedGeneralInquiry.emotion === "object"
+) {
+    const emotion = savedGeneralInquiry.emotion;
+
+    // Emotional state
+    document.querySelectorAll(".emotionState").forEach(checkbox => {
+        checkbox.checked =
+            Array.isArray(emotion.emotionalState) &&
+            emotion.emotionalState.includes(checkbox.value);
+    });
+
+    // Physical effect
+    document.querySelectorAll(
+        'input[name="emotionPhysicalEffect"]'
+    ).forEach(radio => {
+        radio.checked =
+            radio.value === (emotion.physicalEffect || "");
+    });
+
+    // Physical effect notes
+    const emotionPhysicalEffectNotes =
+        document.getElementById("emotionPhysicalEffectNotes");
+
+    if (emotionPhysicalEffectNotes) {
+        emotionPhysicalEffectNotes.value =
+            emotion.physicalEffectNotes || "";
+    }
+
+    // Re-open the correct follow-up question
+    updateEmotionQuestions();
+}
+        // =================================================
+        // SLEEP
+        // =================================================
+
+        if (savedGeneralInquiry.sleep) {
+
+            const sleep =
+                savedGeneralInquiry.sleep;
+
+
+            document.getElementById(
+                "sleepDuration"
+            ).value =
+                sleep.duration || "";
+
+
+            document
+                .querySelectorAll(".sleepDifficulty")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (sleep.difficulty || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document
+                .querySelectorAll(".sleepOther")
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        (sleep.other || [])
+                            .includes(checkbox.value);
+
+                });
+
+
+            document.getElementById(
+                "returnToSleepDuration"
+            ).value =
+                sleep.returnToSleepDuration || "";
+
+
+            document.getElementById(
+                "sleepNotes"
+            ).value =
+                sleep.notes || "";
+
+
+            updateSleepReturnQuestion();
+
+        }
+
+
+
+        // =================================================
+        // ENERGY
+        // =================================================
+
+        document.getElementById(
+            "energyScore"
+        ).value =
+            savedGeneralInquiry.energy?.score || "";
+
+
+        document.getElementById(
+            "energyDetails"
+        ).value =
+            savedGeneralInquiry.energy?.details || "";
+
+
+
+        // =================================================
+        // PAIN
+        // =================================================
+
+        document.getElementById(
+            "painScore"
+        ).value =
+            savedGeneralInquiry.pain?.score || "";
+
+
+        document.getElementById(
+            "painDetails"
+        ).value =
+            savedGeneralInquiry.pain?.details || "";
+
+
+
+        // =================================================
+        // OTHERS
+        // =================================================
+
+        document.getElementById(
+            "others"
+        ).value =
+            savedGeneralInquiry.others || "";
+
+    }
+
+
+
+    // =====================================================
+    // BACK BUTTON
+    // =====================================================
+
+    function goBack() {
+
+        window.location.href =
+            "hpi.html";
+
+    }
+
+function updateTemperatureQuestions() {
+  const selected = document.querySelector(
+    'input[name="temperatureSensation"]:checked'
+  )?.value || "";
+
+  const coldDetails = document.getElementById("coldTemperatureDetails");
+  const hotDetails = document.getElementById("hotTemperatureDetails");
+
+  if (coldDetails) {
+    coldDetails.classList.toggle(
+      "hidden",
+      selected !== "Usually feel cold"
+    );
+  }
+
+  if (hotDetails) {
+    hotDetails.classList.toggle(
+      "hidden",
+      selected !== "Usually feel hot"
+    );
+  }
+}
+
+function updateFeverDetails() {
+  const selected = document.querySelector(
+    'input[name="feverStatus"]:checked'
+  )?.value || "";
+
+  const measuredDetails =
+    document.getElementById("measuredFeverDetails");
+
+  if (measuredDetails) {
+    measuredDetails.classList.toggle(
+      "hidden",
+      selected !== "Measured fever"
+    );
+  }
+}
+function updateSweatingQuestions() {
+  const sweatingEase = document.querySelector(
+    'input[name="sweatingEase"]:checked'
+  )?.value || "";
+
+  const sweatingDetails = document.getElementById("sweatingDetails");
+
+  if (sweatingDetails) {
+    sweatingDetails.classList.toggle(
+      "hidden",
+      sweatingEase !== "Yes, I sweat easily"
+    );
+  }
+
+  const sweatingTiming = Array.from(
+    document.querySelectorAll(".sweatingTiming:checked")
+  ).map(checkbox => checkbox.value);
+
+  const spontaneousDetails = document.getElementById(
+    "spontaneousSweatingDetails"
+  );
+
+  if (spontaneousDetails) {
+    spontaneousDetails.classList.toggle(
+      "hidden",
+      !sweatingTiming.includes(
+        "Spontaneous sweating without obvious activity"
+      )
+    );
+  }
+
+  const locationType = document.querySelector(
+    'input[name="sweatingLocationType"]:checked'
+  )?.value || "";
+
+  const specificLocationDetails = document.getElementById(
+    "specificSweatingLocationDetails"
+  );
+
+  if (specificLocationDetails) {
+    specificLocationDetails.classList.toggle(
+      "hidden",
+      locationType !== "Mainly one specific area" &&
+      locationType !== "Both whole body and specific areas"
+    );
+  }
+}
+
+function updateChestAbdomenQuestions() {
+    const presence = document.querySelector(
+        'input[name="chestAbdomenPresence"]:checked'
+    )?.value || "";
+
+    const details = document.getElementById("chestAbdomenDetails");
+
+    if (details) {
+        details.classList.toggle("hidden", presence !== "Yes");
+    }
+
+    // If the patient does not have chest/abdominal symptoms,
+    // hide all follow-up questions.
+    if (presence !== "Yes") {
+        document.getElementById("chestDetails")?.classList.add("hidden");
+        document.getElementById("abdomenDetails")?.classList.add("hidden");
+        document.getElementById("chestPainQualityDetails")?.classList.add("hidden");
+        document.getElementById("abdominalWarmthDetails")?.classList.add("hidden");
+        document.getElementById("abdominalPressureDetails")?.classList.add("hidden");
+        return;
+    }
+
+    const location = document.querySelector(
+        'input[name="chestAbdomenLocation"]:checked'
+    )?.value || "";
+
+    const showChest =
+        location === "Chest" ||
+        location === "Both chest and abdomen";
+
+    const showAbdomen =
+        location === "Abdomen" ||
+        location === "Both chest and abdomen";
+
+    const chestDetails = document.getElementById("chestDetails");
+    const abdomenDetails = document.getElementById("abdomenDetails");
+
+    if (chestDetails) {
+        chestDetails.classList.toggle("hidden", !showChest);
+    }
+
+    if (abdomenDetails) {
+        abdomenDetails.classList.toggle("hidden", !showAbdomen);
+    }
+
+    // Show chest pain quality only when
+    // "Chest pain or discomfort" is selected.
+    const chestPainSelected = Array.from(
+        document.querySelectorAll(".chestSymptoms:checked")
+    ).some(
+        checkbox => checkbox.value === "Chest pain or discomfort"
+    );
+
+    const chestPainQualityDetails = document.getElementById(
+        "chestPainQualityDetails"
+    );
+
+    if (chestPainQualityDetails) {
+        chestPainQualityDetails.classList.toggle(
+            "hidden",
+            !showChest || !chestPainSelected
+        );
+    }
+
+    // Show abdominal warmth/pressure questions only when
+    // "Abdominal pain or discomfort" is selected.
+    const abdominalPainSelected = Array.from(
+        document.querySelectorAll(".abdominalSymptoms:checked")
+    ).some(
+        checkbox => checkbox.value === "Abdominal pain or discomfort"
+    );
+
+    const abdominalWarmthDetails = document.getElementById(
+        "abdominalWarmthDetails"
+    );
+
+    const abdominalPressureDetails = document.getElementById(
+        "abdominalPressureDetails"
+    );
+
+    if (abdominalWarmthDetails) {
+        abdominalWarmthDetails.classList.toggle(
+            "hidden",
+            !showAbdomen || !abdominalPainSelected
+        );
+    }
+
+    if (abdominalPressureDetails) {
+        abdominalPressureDetails.classList.toggle(
+            "hidden",
+            !showAbdomen || !abdominalPainSelected
+        );
+    }
+}
+
+function updateHeadBodyQuestions() {
+    const presence = document.querySelector(
+        'input[name="headBodyPresence"]:checked'
+    )?.value || "";
+
+    const details = document.getElementById("headBodyDetails");
+
+    if (details) {
+        details.classList.toggle("hidden", presence !== "Yes");
+    }
+
+    // If the patient has no head/body symptoms,
+    // hide all follow-up questions.
+    if (presence !== "Yes") {
+        document.getElementById("headacheDetails")?.classList.add("hidden");
+        document.getElementById("dizzinessDetails")?.classList.add("hidden");
+        document.getElementById("headFaceNumbnessDetails")?.classList.add("hidden");
+        document.getElementById("bodyNumbnessDetails")?.classList.add("hidden");
+        document.getElementById("muscleStiffnessDetails")?.classList.add("hidden");
+        document.getElementById("swellingDetails")?.classList.add("hidden");
+        return;
+    }
+
+    // Check selected head symptoms
+    const headSymptoms = Array.from(
+        document.querySelectorAll(".headSymptoms:checked")
+    ).map(checkbox => checkbox.value);
+
+    // Check selected body symptoms
+    const bodySymptoms = Array.from(
+        document.querySelectorAll(".bodySymptoms:checked")
+    ).map(checkbox => checkbox.value);
+
+    const hasHeadache = headSymptoms.includes("Headache");
+    const hasDizziness = headSymptoms.includes("Dizziness");
+    const hasHeadFaceNumbness = headSymptoms.includes(
+        "Numbness or tingling of the head or face"
+    );
+
+    const hasBodyNumbness = bodySymptoms.includes(
+        "Numbness or tingling"
+    );
+
+    const hasMuscleStiffness = bodySymptoms.includes(
+        "Muscle stiffness or tightness"
+    );
+
+    const hasSwelling = bodySymptoms.includes(
+        "Swelling / edema"
+    );
+
+    // Headache details
+    const headacheDetails = document.getElementById(
+        "headacheDetails"
+    );
+
+    if (headacheDetails) {
+        headacheDetails.classList.toggle(
+            "hidden",
+            !hasHeadache
+        );
+    }
+
+    // Dizziness details
+    const dizzinessDetails = document.getElementById(
+        "dizzinessDetails"
+    );
+
+    if (dizzinessDetails) {
+        dizzinessDetails.classList.toggle(
+            "hidden",
+            !hasDizziness
+        );
+    }
+
+    // Head / face numbness details
+    const headFaceNumbnessDetails = document.getElementById(
+        "headFaceNumbnessDetails"
+    );
+
+    if (headFaceNumbnessDetails) {
+        headFaceNumbnessDetails.classList.toggle(
+            "hidden",
+            !hasHeadFaceNumbness
+        );
+    }
+
+    // Body numbness details
+    const bodyNumbnessDetails = document.getElementById(
+        "bodyNumbnessDetails"
+    );
+
+    if (bodyNumbnessDetails) {
+        bodyNumbnessDetails.classList.toggle(
+            "hidden",
+            !hasBodyNumbness
+        );
+    }
+
+    // Muscle stiffness details
+    const muscleStiffnessDetails = document.getElementById(
+        "muscleStiffnessDetails"
+    );
+
+    if (muscleStiffnessDetails) {
+        muscleStiffnessDetails.classList.toggle(
+            "hidden",
+            !hasMuscleStiffness
+        );
+    }
+
+    // Swelling details
+    const swellingDetails = document.getElementById(
+        "swellingDetails"
+    );
+
+    if (swellingDetails) {
+        swellingDetails.classList.toggle(
+            "hidden",
+            !hasSwelling
+        );
+    }
+}
+
+function updateEarEyesQuestions() {
+    const presence = document.querySelector(
+        'input[name="earEyesPresence"]:checked'
+    )?.value || "";
+
+    const details = document.getElementById("earEyesDetails");
+
+    if (details) {
+        details.classList.toggle(
+            "hidden",
+            presence !== "Yes"
+        );
+    }
+
+    const tinnitusSelected = Array.from(
+        document.querySelectorAll(".earSymptoms:checked")
+    ).some(
+        checkbox =>
+            checkbox.value === "Ringing in the ears (tinnitus)"
+    );
+
+    const tinnitusDetails = document.getElementById(
+        "tinnitusDetails"
+    );
+
+    if (tinnitusDetails) {
+        tinnitusDetails.classList.toggle(
+            "hidden",
+            !tinnitusSelected
+        );
+    }
+}
+function updateEmotionQuestions() {
+    const physicalEffect = document.querySelector(
+        'input[name="emotionPhysicalEffect"]:checked'
+    )?.value || "";
+
+    const details = document.getElementById(
+        "emotionPhysicalEffectDetails"
+    );
+
+    if (details) {
+        details.classList.toggle(
+            "hidden",
+            physicalEffect !== "Yes"
+        );
+    }
+}
+    // =====================================================
+    // SLEEP DYNAMIC QUESTION
+    // =====================================================
+
+    function updateSleepReturnQuestion() {
+
+        const selected =
+            Array.from(
+                document.querySelectorAll(
+                    ".sleepDifficulty:checked"
+                )
+            ).map(
+                checkbox => checkbox.value
+            );
+
+
+        const details =
+            document.getElementById(
+                "sleepReturnDetails"
+            );
+
+
+        if (
+            selected.includes(
+                "Difficulty falling back asleep after waking"
+            ) ||
+            selected.includes(
+                "Frequent waking"
+            )
+        ) {
+
+            details.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            details.classList.add(
+                "hidden"
+            );
+
+
+            document.getElementById(
+                "returnToSleepDuration"
+            ).value = "";
+
+        }
+
+    }
+
+
+
+    // =====================================================
+    // WATCH SLEEP CHECKBOXES
+    // =====================================================
+document.addEventListener("change", function(event) {
+
+  if (event.target.classList.contains("sleepDifficulty")) {
+    updateSleepReturnQuestion();
+  }
+
+  if (event.target.classList.contains("temperatureSensation")) {
+    updateTemperatureQuestions();
+  }
+
+  if (event.target.classList.contains("feverStatus")) {
+    updateFeverDetails();
+  }
+  if (event.target.name === "sweatingEase" ||
+  event.target.classList.contains("sweatingTiming") ||
+  event.target.name === "sweatingLocationType") {
+  updateSweatingQuestions();
+  }
+  if (
+    event.target.name === "chestAbdomenPresence" ||
+    event.target.name === "chestAbdomenLocation" ||
+    event.target.classList.contains("chestSymptoms") ||
+    event.target.classList.contains("abdominalSymptoms")
+) {
+    updateChestAbdomenQuestions();
+}
+if (
+    event.target.name === "headBodyPresence" ||
+    event.target.classList.contains("headSymptoms") ||
+    event.target.classList.contains("bodySymptoms")
+) {
+    updateHeadBodyQuestions();
+}
+   
+ if (
+    event.target.name === "earEyesPresence" ||
+    event.target.classList.contains("earSymptoms")
+) {
+    updateEarEyesQuestions();
+}
+if (
+    event.target.name === "emotionPhysicalEffect"
+) {
+    updateEmotionQuestions();
+}
+}
+
+);
+
+
+
+    // =====================================================
+    // SAVE AND CONTINUE
+    // =====================================================
+
+    function saveAndContinue() {
+
+        const generalInquiry = {};
+
+
+        // =================================================
+        // ORDINARY TEXT FIELDS
+        // =================================================
+
+        textFields.forEach(([id]) => {
+
+    if (
+        id !== "sleep" &&
+        id !== "urination" &&
+        id !== "bowelMovement" &&
+        id !== "appetite" &&
+        id !== "thirst" &&
+        id !== "chillsFever" && 
+        id !== "sweating" &&
+        id !== "chestAbdomen" &&
+        id !== "headBody" &&
+        id !== "earEyes" &&
+        id !== "emotion"
+    ) {
+
+                const element =
+                    document.getElementById(id);
+
+
+                if (element) {
+
+                    generalInquiry[id] =
+                        element.value;
+
+                }
+
+            }
+
+        });
+
+        // =================================================
+        // CHILLS / FEVER
+        // =================================================
+
+        generalInquiry.chillsFever = {
+
+            temperatureSensation:
+                document.querySelector(
+                    'input[name="temperatureSensation"]:checked'
+                )?.value || "",
+
+
+            coldCharacteristics:
+                Array.from(
+                    document.querySelectorAll(
+                        ".coldCharacteristic:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            hotCharacteristics:
+                Array.from(
+                    document.querySelectorAll(
+                        ".hotCharacteristic:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            feverStatus:
+                document.querySelector(
+                    'input[name="feverStatus"]:checked'
+                )?.value || "",
+
+
+            highestTemperature:
+                document.getElementById(
+                    "highestTemperature"
+                )?.value || "",
+
+
+            temperatureMethod:
+                document.getElementById(
+                    "temperatureMethod"
+                )?.value || "",
+
+
+            feverTiming:
+                document.getElementById(
+                    "feverTiming"
+                )?.value || "",
+
+
+            associatedSymptoms:
+                Array.from(
+                    document.querySelectorAll(
+                        ".chillsFeverAssociated:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            notes:
+                document.getElementById(
+                    "chillsFeverNotes"
+                )?.value || ""
+
+        };
+        generalInquiry.sweating = {
+    ease: document.querySelector(
+        'input[name="sweatingEase"]:checked'
+    )?.value || "",
+
+    timing: Array.from(
+        document.querySelectorAll(".sweatingTiming:checked")
+    ).map(checkbox => checkbox.value),
+
+    spontaneousSweatingTime: document.querySelector(
+        'input[name="spontaneousSweatingTime"]:checked'
+    )?.value || "",
+
+    amount: document.querySelector(
+        'input[name="sweatingAmount"]:checked'
+    )?.value || "",
+
+    locationType: document.querySelector(
+        'input[name="sweatingLocationType"]:checked'
+    )?.value || "",
+
+    specificLocations: Array.from(
+        document.querySelectorAll(".specificSweatingLocation:checked")
+    ).map(checkbox => checkbox.value)
+};
+generalInquiry.chestAbdomen = {
+    presence: document.querySelector(
+        'input[name="chestAbdomenPresence"]:checked'
+    )?.value || "",
+
+    location: document.querySelector(
+        'input[name="chestAbdomenLocation"]:checked'
+    )?.value || "",
+
+    chestSymptoms: Array.from(
+        document.querySelectorAll(".chestSymptoms:checked")
+    ).map(checkbox => checkbox.value),
+
+    chestPainQuality: Array.from(
+        document.querySelectorAll(".chestPainQuality:checked")
+    ).map(checkbox => checkbox.value),
+
+    abdominalSymptoms: Array.from(
+        document.querySelectorAll(".abdominalSymptoms:checked")
+    ).map(checkbox => checkbox.value),
+
+    abdominalWarmth: document.querySelector(
+        'input[name="abdominalWarmth"]:checked'
+    )?.value || "",
+
+    abdominalPressure: document.querySelector(
+        'input[name="abdominalPressure"]:checked'
+    )?.value || ""
+};
+
+generalInquiry.headBody = {
+    presence: document.querySelector(
+        'input[name="headBodyPresence"]:checked'
+    )?.value || "",
+
+    headSymptoms: Array.from(
+        document.querySelectorAll(".headSymptoms:checked")
+    ).map(checkbox => checkbox.value),
+
+    headacheQuality: Array.from(
+        document.querySelectorAll(".headacheQuality:checked")
+    ).map(checkbox => checkbox.value),
+
+    headacheLocation: Array.from(
+        document.querySelectorAll(".headacheLocation:checked")
+    ).map(checkbox => checkbox.value),
+
+    dizzinessType: document.querySelector(
+        'input[name="dizzinessType"]:checked'
+    )?.value || "",
+
+    headFaceNumbnessLocation: Array.from(
+        document.querySelectorAll(".headFaceNumbnessLocation:checked")
+    ).map(checkbox => checkbox.value),
+
+    bodySymptoms: Array.from(
+        document.querySelectorAll(".bodySymptoms:checked")
+    ).map(checkbox => checkbox.value),
+
+    bodyNumbnessLocation: Array.from(
+        document.querySelectorAll(".bodyNumbnessLocation:checked")
+    ).map(checkbox => checkbox.value),
+
+    muscleStiffnessLocation: Array.from(
+        document.querySelectorAll(".muscleStiffnessLocation:checked")
+    ).map(checkbox => checkbox.value),
+
+    swellingLocation: Array.from(
+        document.querySelectorAll(".swellingLocation:checked")
+    ).map(checkbox => checkbox.value)
+};
+generalInquiry.earEyes = {
+    presence: document.querySelector(
+        'input[name="earEyesPresence"]:checked'
+    )?.value || "",
+
+    earSymptoms: Array.from(
+        document.querySelectorAll(".earSymptoms:checked")
+    ).map(checkbox => checkbox.value),
+
+    tinnitusType: document.querySelector(
+        'input[name="tinnitusType"]:checked'
+    )?.value || "",
+
+    eyeSymptoms: Array.from(
+        document.querySelectorAll(".eyeSymptoms:checked")
+    ).map(checkbox => checkbox.value)
+};
+generalInquiry.emotion = {
+    emotionalState: Array.from(
+        document.querySelectorAll(".emotionState:checked")
+    ).map(checkbox => checkbox.value),
+
+    physicalEffect: document.querySelector(
+        'input[name="emotionPhysicalEffect"]:checked'
+    )?.value || "",
+
+    physicalEffectNotes: document.getElementById(
+        "emotionPhysicalEffectNotes"
+    )?.value || ""
+};
+
+        // =================================================
+        // APPETITE
+        // =================================================
+
+        generalInquiry.appetite = {
+
+            level:
+                document.querySelector(
+                    'input[name="appetiteLevel"]:checked'
+                )?.value || "",
+
+
+            mealsPerDay:
+                document.querySelector(
+                    'input[name="mealsPerDay"]:checked'
+                )?.value || "",
+
+
+            typicalFood:
+                Array.from(
+                    document.querySelectorAll(
+                        ".typicalFood:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            foodCravings:
+                Array.from(
+                    document.querySelectorAll(
+                        ".foodCraving:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            eatingHabits:
+                Array.from(
+                    document.querySelectorAll(
+                        ".eatingHabit:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            notes:
+                document.getElementById(
+                    "appetiteNotes"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // THIRST
+        // =================================================
+
+        generalInquiry.thirst = {
+
+            level:
+                document.querySelector(
+                    'input[name="thirstLevel"]:checked'
+                )?.value || "",
+
+
+            fluidIntake:
+                document.querySelector(
+                    'input[name="fluidIntake"]:checked'
+                )?.value || "",
+
+
+            drinkingPreference:
+                document.querySelector(
+                    'input[name="drinkingPreference"]:checked'
+                )?.value || "",
+
+
+            characteristics:
+                Array.from(
+                    document.querySelectorAll(
+                        ".thirstCharacteristic:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            notes:
+                document.getElementById(
+                    "thirstNotes"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // SLEEP
+        // =================================================
+
+        generalInquiry.sleep = {
+
+            duration:
+                document.getElementById(
+                    "sleepDuration"
+                ).value,
+
+
+            difficulty:
+                Array.from(
+                    document.querySelectorAll(
+                        ".sleepDifficulty:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            returnToSleepDuration:
+                document.getElementById(
+                    "returnToSleepDuration"
+                ).value,
+
+
+            other:
+                Array.from(
+                    document.querySelectorAll(
+                        ".sleepOther:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            notes:
+                document.getElementById(
+                    "sleepNotes"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // URINATION
+        // =================================================
+
+        generalInquiry.urination = {
+
+            daytime:
+                document.querySelector(
+                    'input[name="urinationDaytime"]:checked'
+                )?.value || "",
+
+
+            nighttime:
+                document.querySelector(
+                    'input[name="urinationNighttime"]:checked'
+                )?.value || "",
+
+
+            color:
+                document.querySelector(
+                    'input[name="urineColor"]:checked'
+                )?.value || "",
+
+
+            amount:
+                document.querySelector(
+                    'input[name="urineAmount"]:checked'
+                )?.value || "",
+
+
+            odor:
+                document.querySelector(
+                    'input[name="urineOdor"]:checked'
+                )?.value || "",
+
+
+            symptoms:
+                Array.from(
+                    document.querySelectorAll(
+                        ".urinationSymptom:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            notes:
+                document.getElementById(
+                    "urinationNotes"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // BOWEL MOVEMENT
+        // =================================================
+
+        generalInquiry.bowelMovement = {
+
+            frequency:
+                document.querySelector(
+                    'input[name="bowelFrequency"]:checked'
+                )?.value || "",
+
+
+            consistency:
+                Array.from(
+                    document.querySelectorAll(
+                        ".stoolConsistency:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            difficulty:
+                Array.from(
+                    document.querySelectorAll(
+                        ".bowelDifficulty:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            characteristics:
+                Array.from(
+                    document.querySelectorAll(
+                        ".stoolCharacteristics:checked"
+                    )
+                ).map(
+                    checkbox => checkbox.value
+                ),
+
+
+            notes:
+                document.getElementById(
+                    "bowelNotes"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // ENERGY
+        // =================================================
+
+        generalInquiry.energy = {
+
+            score:
+                document.getElementById(
+                    "energyScore"
+                ).value,
+
+
+            details:
+                document.getElementById(
+                    "energyDetails"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // PAIN
+        // =================================================
+
+        generalInquiry.pain = {
+
+            score:
+                document.getElementById(
+                    "painScore"
+                ).value,
+
+
+            details:
+                document.getElementById(
+                    "painDetails"
+                ).value
+
+        };
+
+
+
+        // =================================================
+        // OTHERS
+        // =================================================
+
+        generalInquiry.others =
+            document.getElementById(
+                "others"
+            ).value;
+
+
+
+        // =================================================
+        // SAVE EVERYTHING
+        // =================================================
+
+        localStorage.setItem(
+            "generalInquiry",
+            JSON.stringify(
+                generalInquiry
+            )
+        );
+
+
+
+        // =================================================
+        // NEXT PAGE
+        // =================================================
+
+        window.location.href =
+            "lifestyle.html";
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
+```

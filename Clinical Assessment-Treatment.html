@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Clinical Assessment & Treatment</title>
+
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            background: #f5f5f5;
+        }
+
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 35px;
+        }
+
+
+        h2 {
+            margin-top: 35px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+        }
+
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+
+        input,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+
+        .large-textarea {
+            min-height: 160px;
+        }
+
+
+        .small-textarea {
+            min-height: 90px;
+        }
+
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 35px;
+            flex-wrap: wrap;
+        }
+
+
+        .button-row button {
+            padding: 12px 20px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+
+        .status-message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        Clinical Assessment & Treatment
+    </h1>
+
+
+
+    <!-- ========================================= -->
+    <!-- 1. TCM DIAGNOSIS / PATTERN DIFFERENTIATION -->
+    <!-- ========================================= -->
+
+    <h2>
+        1. TCM Diagnosis / Pattern Differentiation
+    </h2>
+
+
+    <label for="tcmDisease">
+        TCM Disease Diagnosis
+    </label>
+
+    <input
+        type="text"
+        id="tcmDisease"
+        placeholder="Enter TCM disease diagnosis..."
+    >
+
+
+    <label for="patternDifferentiation">
+        Pattern / Syndrome Differentiation
+    </label>
+
+    <textarea
+        id="patternDifferentiation"
+        placeholder="Enter pattern / syndrome differentiation..."
+    ></textarea>
+
+
+    <label for="etiologyPathogenesis">
+        Etiology / Pathogenesis
+    </label>
+
+    <textarea
+        id="etiologyPathogenesis"
+        class="large-textarea"
+        placeholder="Enter etiology and pathogenesis..."
+    ></textarea>
+
+
+    <label for="benBiao">
+        Ben / Biao
+    </label>
+
+    <textarea
+        id="benBiao"
+        class="small-textarea"
+        placeholder="Describe the root (Ben) and branch (Biao)..."
+    ></textarea>
+
+
+
+    <!-- ========================================= -->
+    <!-- 2. TREATMENT PRINCIPLE -->
+    <!-- ========================================= -->
+
+    <h2>
+        2. Treatment Principle
+    </h2>
+
+
+    <textarea
+        id="treatmentPrinciple"
+        class="large-textarea"
+        placeholder="Enter treatment principle..."
+    ></textarea>
+
+
+
+    <!-- ========================================= -->
+    <!-- 3. POINTS -->
+    <!-- ========================================= -->
+
+    <h2>
+        3. Points
+    </h2>
+
+
+    <textarea
+        id="acupuncturePoints"
+        class="large-textarea"
+        placeholder="Enter acupuncture points..."
+    ></textarea>
+
+
+    <label for="acupunctureNotes">
+        Acupuncture Notes
+    </label>
+
+    <textarea
+        id="acupunctureNotes"
+        class="small-textarea"
+        placeholder="Additional acupuncture notes, techniques, electroacupuncture, moxibustion, etc."
+    ></textarea>
+
+
+
+    <!-- ========================================= -->
+    <!-- 4. HERBAL PRESCRIPTION -->
+    <!-- ========================================= -->
+
+    <h2>
+        4. Herbal Prescription
+    </h2>
+
+
+    <textarea
+        id="herbalPrescription"
+        class="large-textarea"
+        placeholder="Enter herbal prescription..."
+    ></textarea>
+
+
+    <label for="herbalNotes">
+        Herbal Notes
+    </label>
+
+    <textarea
+        id="herbalNotes"
+        class="small-textarea"
+        placeholder="Formula modifications, dosage instructions, preparation, etc."
+    ></textarea>
+
+
+
+    <!-- ========================================= -->
+    <!-- BUTTONS -->
+    <!-- ========================================= -->
+
+    <div class="button-row">
+
+
+        <button
+            type="button"
+            onclick="saveTreatmentPlan()"
+        >
+            Save
+        </button>
+
+
+        <button
+            type="button"
+            onclick="window.location.href='case-summary.html'"
+        >
+            ← Back to Case Summary
+        </button>
+
+
+    </div>
+
+
+    <div
+        id="statusMessage"
+        class="status-message"
+    ></div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================
+   SAVE TREATMENT PLAN
+   ========================================= */
+
+
+function saveTreatmentPlan() {
+
+    const treatmentPlan = {
+
+        tcmDisease:
+            document
+                .getElementById("tcmDisease")
+                .value
+                .trim(),
+
+        patternDifferentiation:
+            document
+                .getElementById("patternDifferentiation")
+                .value
+                .trim(),
+
+        etiologyPathogenesis:
+            document
+                .getElementById("etiologyPathogenesis")
+                .value
+                .trim(),
+
+        benBiao:
+            document
+                .getElementById("benBiao")
+                .value
+                .trim(),
+
+        treatmentPrinciple:
+            document
+                .getElementById("treatmentPrinciple")
+                .value
+                .trim(),
+
+        acupuncturePoints:
+            document
+                .getElementById("acupuncturePoints")
+                .value
+                .trim(),
+
+        acupunctureNotes:
+            document
+                .getElementById("acupunctureNotes")
+                .value
+                .trim(),
+
+        herbalPrescription:
+            document
+                .getElementById("herbalPrescription")
+                .value
+                .trim(),
+
+        herbalNotes:
+            document
+                .getElementById("herbalNotes")
+                .value
+                .trim()
+
+    };
+
+
+    localStorage.setItem(
+        "treatmentPlan",
+        JSON.stringify(treatmentPlan)
+    );
+
+
+    document
+        .getElementById("statusMessage")
+        .textContent =
+            "Treatment plan saved successfully.";
+
+}
+
+
+
+/* =========================================
+   LOAD SAVED TREATMENT PLAN
+   ========================================= */
+
+
+function loadTreatmentPlan() {
+
+    const saved =
+        localStorage.getItem(
+            "treatmentPlan"
+        );
+
+
+    if (!saved) {
+
+        return;
+
+    }
+
+
+    const data =
+        JSON.parse(saved);
+
+
+    document
+        .getElementById("tcmDisease")
+        .value =
+            data.tcmDisease || "";
+
+
+    document
+        .getElementById("patternDifferentiation")
+        .value =
+            data.patternDifferentiation || "";
+
+
+    document
+        .getElementById("etiologyPathogenesis")
+        .value =
+            data.etiologyPathogenesis || "";
+
+
+    document
+        .getElementById("benBiao")
+        .value =
+            data.benBiao || "";
+
+
+    document
+        .getElementById("treatmentPrinciple")
+        .value =
+            data.treatmentPrinciple || "";
+
+
+    document
+        .getElementById("acupuncturePoints")
+        .value =
+            data.acupuncturePoints || "";
+
+
+    document
+        .getElementById("acupunctureNotes")
+        .value =
+            data.acupunctureNotes || "";
+
+
+    document
+        .getElementById("herbalPrescription")
+        .value =
+            data.herbalPrescription || "";
+
+
+    document
+        .getElementById("herbalNotes")
+        .value =
+            data.herbalNotes || "";
+
+}
+
+
+
+/* =========================================
+   INITIALIZE PAGE
+   ========================================= */
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadTreatmentPlan();
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

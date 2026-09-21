@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCM Clinical Assistant - Medical History</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .patient-summary { background: #f3f3f3; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+        .section { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .section h2 { margin-top: 0; }
+        label { display: block; margin: 8px 0; }
+        input, textarea { box-sizing: border-box; padding: 8px; margin-top: 5px; font: inherit; }
+        textarea { width: 100%; max-width: 650px; }
+        input[type="checkbox"] { width: auto; margin-right: 6px; }
+        .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 3px 18px; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; }
+        .navigation { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
+        .note { color: #555; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+    <h1>TCM Clinical Assistant</h1>
+    <div class="patient-summary">
+        <h2>Patient Information</h2>
+        <p><strong>Patient:</strong> <span id="patientName"></span></p>
+        <p><strong>Age:</strong> <span id="patientAge"></span></p>
+        <p><strong>Sex:</strong> <span id="patientSex"></span></p>
+        <p><strong>Chief Complaint:</strong> <span id="patientComplaint"></span></p>
+    </div>
+
+    <h2>Medical History</h2>
+
+    <div class="section">
+        <h2>Past Medical History</h2>
+        <p>Select any known conditions.</p>
+        <div class="options" id="conditionOptions">
+            <label><input type="checkbox" value="High blood pressure"> High blood pressure</label>
+            <label><input type="checkbox" value="Diabetes"> Diabetes</label>
+            <label><input type="checkbox" value="High cholesterol"> High cholesterol</label>
+            <label><input type="checkbox" value="Heart disease"> Heart disease</label>
+            <label><input type="checkbox" value="Asthma or COPD"> Asthma or COPD</label>
+            <label><input type="checkbox" value="Thyroid condition"> Thyroid condition</label>
+            <label><input type="checkbox" value="Digestive condition"> Digestive condition</label>
+            <label><input type="checkbox" value="Kidney condition"> Kidney condition</label>
+            <label><input type="checkbox" value="Liver condition"> Liver condition</label>
+            <label><input type="checkbox" value="Arthritis"> Arthritis</label>
+            <label><input type="checkbox" value="Anxiety or depression"> Anxiety or depression</label>
+            <label><input type="checkbox" value="Cancer"> Cancer</label>
+        </div>
+        <label for="conditionOther">Other condition(s)</label>
+        <textarea id="conditionOther" rows="2"></textarea>
+    </div>
+
+    <div class="section">
+        <h2>Allergies</h2>
+        <label for="allergies">Medication, food, or environmental allergies — include the reaction if known</label>
+        <textarea id="allergies" rows="3" placeholder="For example: penicillin — rash. Write None if there are no known allergies."></textarea>
+    </div>
+
+    <div class="section">
+        <h2>Surgery / Hospitalization</h2>
+        <label for="surgeryHospitalization">Relevant surgery, hospitalization, or major injury</label>
+        <textarea id="surgeryHospitalization" rows="3" placeholder="Include the approximate year if known, or write None."></textarea>
+    </div>
+
+    <div class="section">
+        <h2>Current Medications</h2>
+        <p class="note">This is a quick recording list only. Check medicines the patient is currently taking; do not use it to select treatment or dosage.</p>
+        <div class="options" id="medicationOptions">
+            <label><input type="checkbox" value="Acetaminophen (Tylenol)"> Acetaminophen (Tylenol)</label>
+            <label><input type="checkbox" value="Ibuprofen (Advil / Motrin)"> Ibuprofen (Advil / Motrin)</label>
+            <label><input type="checkbox" value="Naproxen (Aleve)"> Naproxen (Aleve)</label>
+            <label><input type="checkbox" value="Aspirin (Bayer)"> Aspirin (Bayer)</label>
+            <label><input type="checkbox" value="Diclofenac (Voltaren)"> Diclofenac (Voltaren)</label>
+            <label><input type="checkbox" value="Omeprazole (Losec / Prilosec)"> Omeprazole (Losec / Prilosec)</label>
+            <label><input type="checkbox" value="Pantoprazole (Pantoloc / Protonix)"> Pantoprazole (Pantoloc / Protonix)</label>
+            <label><input type="checkbox" value="Cetirizine (Reactine / Zyrtec)"> Cetirizine (Reactine / Zyrtec)</label>
+            <label><input type="checkbox" value="Loratadine (Claritin)"> Loratadine (Claritin)</label>
+            <label><input type="checkbox" value="Amlodipine (Norvasc)"> Amlodipine (Norvasc)</label>
+            <label><input type="checkbox" value="Ramipril (Altace)"> Ramipril (Altace)</label>
+            <label><input type="checkbox" value="Losartan (Cozaar)"> Losartan (Cozaar)</label>
+            <label><input type="checkbox" value="Metoprolol (Lopressor)"> Metoprolol (Lopressor)</label>
+            <label><input type="checkbox" value="Atorvastatin (Lipitor)"> Atorvastatin (Lipitor)</label>
+            <label><input type="checkbox" value="Metformin (Glucophage)"> Metformin (Glucophage)</label>
+            <label><input type="checkbox" value="Insulin"> Insulin</label>
+            <label><input type="checkbox" value="Salbutamol (Ventolin)"> Salbutamol (Ventolin)</label>
+            <label><input type="checkbox" value="Levothyroxine (Synthroid)"> Levothyroxine (Synthroid)</label>
+            <label><input type="checkbox" value="Sertraline (Zoloft)"> Sertraline (Zoloft)</label>
+            <label><input type="checkbox" value="Escitalopram (Cipralex / Lexapro)"> Escitalopram (Cipralex / Lexapro)</label>
+        </div>
+        <label for="otherMedication">Other medication, vitamins, herbs, or Chinese medicine</label>
+        <textarea id="otherMedication" rows="3" placeholder="Record the name and dose if the patient knows it."></textarea>
+    </div>
+
+    <div class="section">
+        <h2>Family History</h2>
+        <label for="familyHistory">Relevant health conditions in parents, siblings, or children</label>
+        <textarea id="familyHistory" rows="3" placeholder="For example: mother has diabetes; father has hypertension."></textarea>
+    </div>
+
+    <div class="navigation">
+        <button type="button" onclick="window.location.href='menstruation.html'">← Back</button>
+        <button type="button" onclick="saveMedicalHistory()">Save and Continue →</button>
+    </div>
+
+    <script>
+        const patient = JSON.parse(localStorage.getItem("patient"));
+        if (patient) {
+            document.getElementById("patientName").textContent = patient.firstName;
+            document.getElementById("patientAge").textContent = patient.age;
+            document.getElementById("patientSex").textContent = patient.sex;
+            document.getElementById("patientComplaint").textContent = patient.chiefComplaint;
+        }
+
+        function checkedValues(containerId) {
+            return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(item => item.value);
+        }
+
+        function restoreCheckedValues(containerId, values) {
+            document.querySelectorAll(`#${containerId} input`).forEach(item => {
+                item.checked = values.includes(item.value);
+            });
+        }
+
+        const savedMedicalHistory = JSON.parse(localStorage.getItem("medicalHistory"));
+        if (savedMedicalHistory) {
+            restoreCheckedValues("conditionOptions", savedMedicalHistory.conditions || []);
+            restoreCheckedValues("medicationOptions", savedMedicalHistory.medications || []);
+            document.getElementById("conditionOther").value = savedMedicalHistory.conditionOther || "";
+            document.getElementById("allergies").value = savedMedicalHistory.allergies || "";
+            document.getElementById("surgeryHospitalization").value = savedMedicalHistory.surgeryHospitalization || "";
+            document.getElementById("otherMedication").value = savedMedicalHistory.otherMedication || "";
+            document.getElementById("familyHistory").value = savedMedicalHistory.familyHistory || "";
+        }
+
+        function saveMedicalHistory() {
+            const medicalHistory = {
+                conditions: checkedValues("conditionOptions"),
+                conditionOther: document.getElementById("conditionOther").value,
+                allergies: document.getElementById("allergies").value,
+                surgeryHospitalization: document.getElementById("surgeryHospitalization").value,
+                medications: checkedValues("medicationOptions"),
+                otherMedication: document.getElementById("otherMedication").value,
+                familyHistory: document.getElementById("familyHistory").value
+            };
+
+            localStorage.setItem("medicalHistory", JSON.stringify(medicalHistory));
+            window.location.href = "tongue.html";
+        }
+    </script>
+</body>
+</html>

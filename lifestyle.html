@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TCM Clinical Assistant - Lifestyle</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-top: 10px;
+        }
+
+        .section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .question-group {
+            margin-top: 20px;
+        }
+
+        .question-group > label:first-child {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .option {
+            display: block;
+            margin: 8px 0;
+            font-weight: normal;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            max-width: 500px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 10px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>TCM Clinical Assistant</h1>
+
+    <h2>Lifestyle</h2>
+
+    <!-- Smoking -->
+    <div class="section">
+
+        <h2>Smoking</h2>
+
+        <div class="question-group">
+
+            <label>
+                Do you smoke?
+            </label>
+
+            <label class="option">
+                <input type="radio"
+                       name="smokingStatus"
+                       value="No">
+                No
+            </label>
+
+            <label class="option">
+                <input type="radio"
+                       name="smokingStatus"
+                       value="Cigarettes">
+                Cigarettes
+            </label>
+
+            <label class="option">
+                <input type="radio"
+                       name="smokingStatus"
+                       value="Cannabis">
+                Cannabis
+            </label>
+
+        </div>
+
+
+        <div id="cigaretteDurationDetails"
+             class="question-group hidden">
+
+            <label>
+                How long have you been smoking cigarettes?
+            </label>
+
+            <input type="text"
+                   id="cigaretteDuration"
+                   placeholder="e.g. 20 years">
+
+        </div>
+
+
+        <div id="cannabisDurationDetails"
+             class="question-group hidden">
+
+            <label>
+                How long have you been using cannabis?
+            </label>
+
+            <input type="text"
+                   id="cannabisDuration"
+                   placeholder="e.g. 5 years">
+
+        </div>
+
+    </div>
+
+
+    <!-- Alcohol -->
+    <div class="section">
+
+        <h2>Alcohol</h2>
+
+        <div class="question-group">
+
+            <label>
+                How do you usually drink alcohol?
+            </label>
+
+            <label class="option">
+                <input type="radio"
+                       name="drinkingStatus"
+                       value="I do not drink alcohol">
+                I do not drink alcohol
+            </label>
+
+            <label class="option">
+                <input type="radio"
+                       name="drinkingStatus"
+                       value="Socially / occasionally">
+                Socially / occasionally
+            </label>
+
+            <label class="option">
+                <input type="radio"
+                       name="drinkingStatus"
+                       value="Daily">
+                Daily
+            </label>
+
+        </div>
+
+
+        <div id="dailyDrinkingDetails"
+             class="question-group hidden">
+
+            <label>
+                How long have you been drinking daily?
+            </label>
+
+            <input type="text"
+                   id="dailyDrinkingDuration"
+                   placeholder="e.g. 10 years">
+
+        </div>
+
+    </div>
+
+
+    <!-- Occupation -->
+    <div class="section">
+
+        <h2>Occupation</h2>
+
+        <div class="question-group">
+
+            <label>
+                What is your occupation or main type of work?
+            </label>
+
+            <input type="text"
+                   id="occupationName"
+                   placeholder="Please enter occupation or type of work...">
+
+        </div>
+
+
+        <div class="question-group">
+
+            <label>
+                What is your work mainly like?
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Mainly sitting">
+                Mainly sitting
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Mainly standing">
+                Mainly standing
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Walking / physically active">
+                Walking / physically active
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Heavy physical work">
+                Heavy physical work
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Repetitive movements">
+                Repetitive movements
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Prolonged computer / screen work">
+                Prolonged computer / screen work
+            </label>
+
+            <label class="option">
+                <input type="checkbox"
+                       class="workType"
+                       value="Other">
+                Other
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <!-- Buttons -->
+    <div class="buttons">
+
+        <button type="button"
+                onclick="goBack()">
+            ← Back to General Inquiry
+        </button>
+
+        <button type="button"
+                onclick="saveAndContinue()">
+            Continue to Menstruation Assessment →
+        </button>
+
+    </div>
+
+
+<script>
+
+    function updateSmokingQuestions() {
+
+        const smokingStatus = document.querySelector(
+            'input[name="smokingStatus"]:checked'
+        )?.value || "";
+
+        const cigaretteDetails =
+            document.getElementById("cigaretteDurationDetails");
+
+        const cannabisDetails =
+            document.getElementById("cannabisDurationDetails");
+
+
+        if (cigaretteDetails) {
+            cigaretteDetails.classList.toggle(
+                "hidden",
+                smokingStatus !== "Cigarettes"
+            );
+        }
+
+
+        if (cannabisDetails) {
+            cannabisDetails.classList.toggle(
+                "hidden",
+                smokingStatus !== "Cannabis"
+            );
+        }
+    }
+
+
+    function updateDrinkingQuestions() {
+
+        const drinkingStatus = document.querySelector(
+            'input[name="drinkingStatus"]:checked'
+        )?.value || "";
+
+        const dailyDetails =
+            document.getElementById("dailyDrinkingDetails");
+
+
+        if (dailyDetails) {
+            dailyDetails.classList.toggle(
+                "hidden",
+                drinkingStatus !== "Daily"
+            );
+        }
+    }
+
+
+    document.addEventListener("change", function(event) {
+
+        if (event.target.name === "smokingStatus") {
+            updateSmokingQuestions();
+        }
+
+
+        if (event.target.name === "drinkingStatus") {
+            updateDrinkingQuestions();
+        }
+
+    });
+
+
+    function saveLifestyle() {
+
+        const lifestyle = {
+
+            smoking: {
+                status: document.querySelector(
+                    'input[name="smokingStatus"]:checked'
+                )?.value || "",
+
+                cigaretteDuration:
+                    document.getElementById(
+                        "cigaretteDuration"
+                    )?.value || "",
+
+                cannabisDuration:
+                    document.getElementById(
+                        "cannabisDuration"
+                    )?.value || ""
+            },
+
+
+            drinking: {
+                status: document.querySelector(
+                    'input[name="drinkingStatus"]:checked'
+                )?.value || "",
+
+                dailyDuration:
+                    document.getElementById(
+                        "dailyDrinkingDuration"
+                    )?.value || ""
+            },
+
+
+            occupation: {
+                occupation:
+                    document.getElementById(
+                        "occupationName"
+                    )?.value || "",
+
+                workType: Array.from(
+                    document.querySelectorAll(
+                        ".workType:checked"
+                    )
+                ).map(checkbox => checkbox.value)
+            }
+
+        };
+
+
+        localStorage.setItem(
+            "lifestyle",
+            JSON.stringify(lifestyle)
+        );
+    }
+
+
+    function loadLifestyle() {
+
+        const savedLifestyle = JSON.parse(
+            localStorage.getItem("lifestyle")
+        ) || {};
+
+
+        if (
+            savedLifestyle.smoking &&
+            typeof savedLifestyle.smoking === "object"
+        ) {
+
+            const smoking =
+                savedLifestyle.smoking;
+
+
+            document.querySelectorAll(
+                'input[name="smokingStatus"]'
+            ).forEach(radio => {
+
+                radio.checked =
+                    radio.value ===
+                    (smoking.status || "");
+
+            });
+
+
+            const cigaretteDuration =
+                document.getElementById(
+                    "cigaretteDuration"
+                );
+
+            if (cigaretteDuration) {
+                cigaretteDuration.value =
+                    smoking.cigaretteDuration || "";
+            }
+
+
+            const cannabisDuration =
+                document.getElementById(
+                    "cannabisDuration"
+                );
+
+            if (cannabisDuration) {
+                cannabisDuration.value =
+                    smoking.cannabisDuration || "";
+            }
+
+
+            updateSmokingQuestions();
+        }
+
+
+        if (
+            savedLifestyle.drinking &&
+            typeof savedLifestyle.drinking === "object"
+        ) {
+
+            const drinking =
+                savedLifestyle.drinking;
+
+
+            document.querySelectorAll(
+                'input[name="drinkingStatus"]'
+            ).forEach(radio => {
+
+                radio.checked =
+                    radio.value ===
+                    (drinking.status || "");
+
+            });
+
+
+            const dailyDuration =
+                document.getElementById(
+                    "dailyDrinkingDuration"
+                );
+
+            if (dailyDuration) {
+                dailyDuration.value =
+                    drinking.dailyDuration || "";
+            }
+
+
+            updateDrinkingQuestions();
+        }
+
+
+        if (
+            savedLifestyle.occupation &&
+            typeof savedLifestyle.occupation === "object"
+        ) {
+
+            const occupation =
+                savedLifestyle.occupation;
+
+
+            const occupationName =
+                document.getElementById(
+                    "occupationName"
+                );
+
+            if (occupationName) {
+                occupationName.value =
+                    occupation.occupation || "";
+            }
+
+
+            document.querySelectorAll(
+                ".workType"
+            ).forEach(checkbox => {
+
+                checkbox.checked =
+                    Array.isArray(
+                        occupation.workType
+                    ) &&
+                    occupation.workType.includes(
+                        checkbox.value
+                    );
+
+            });
+
+        }
+
+    }
+
+
+    function goBack() {
+
+        saveLifestyle();
+
+        window.location.href =
+            "associated.html";
+    }
+
+
+    function saveAndContinue() {
+
+        saveLifestyle();
+
+        window.location.href =
+            "menstruation.html";
+    }
+
+
+    window.addEventListener(
+        "DOMContentLoaded",
+        loadLifestyle
+    );
+
+</script>
+
+</body>
+</html>

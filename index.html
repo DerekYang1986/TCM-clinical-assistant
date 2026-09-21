@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCM Clinical Assistant</title>
+</head>
+
+<body>
+
+    <h1>TCM Clinical Assistant</h1>
+
+    <h2>Patient Information</h2>
+
+    <label>Patient First Name:</label>
+    <input type="text" id="firstName">
+
+    <br><br>
+
+    <label>Age:</label>
+    <input type="number" id="age">
+
+    <br><br>
+
+    <label>Sex:</label>
+    <select id="sex">
+        <option value="">Please select</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <br><br>
+
+    <h2>Chief Complaint</h2>
+
+    <label>What is the patient's main complaint?</label>
+    <br>
+
+    <textarea id="chiefComplaint" rows="4" cols="50"></textarea>
+
+    <br><br>
+
+ <button onclick="goToHPI()">Next →</button>
+
+<script>
+    function goToHPI() {
+
+        const patient = {
+            firstName: document.getElementById("firstName").value,
+            age: document.getElementById("age").value,
+            sex: document.getElementById("sex").value,
+            chiefComplaint: document.getElementById("chiefComplaint").value
+        };
+
+        localStorage.setItem("patient", JSON.stringify(patient));
+
+        window.location.href = "hpi.html";
+    }
+</script>
+
+</body>
+</html>

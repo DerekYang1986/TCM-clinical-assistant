@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>TCM Clinical Assistant - OPQRST</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .patient-summary {
+            background: #f3f3f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin: 8px 0;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 8px;
+            margin-top: 5px;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        .options label {
+            display: block;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .pain-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            max-width: 500px;
+        }
+
+        .navigation {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+<div class="section">
+
+    <h2>Pain Assessment</h2>
+
+    <p>
+        Is the patient's chief complaint related to pain?
+    </p>
+
+    <button onclick="startPainAssessment()">
+        Yes — Start OPQRST
+    </button>
+
+    <button onclick="skipPainAssessment()">
+        No — Skip Pain Assessment
+    </button>
+
+</div>
+    <h1>TCM Clinical Assistant</h1>
+
+
+    <!-- ========================= -->
+    <!-- PATIENT SUMMARY -->
+    <!-- ========================= -->
+
+    <div class="patient-summary">
+
+        <h2>Patient Information</h2>
+
+        <p>
+            <strong>Patient:</strong>
+            <span id="patientName"></span>
+        </p>
+
+        <p>
+            <strong>Age:</strong>
+            <span id="patientAge"></span>
+        </p>
+
+        <p>
+            <strong>Sex:</strong>
+            <span id="patientSex"></span>
+        </p>
+
+        <p>
+            <strong>Chief Complaint:</strong>
+            <span id="patientComplaint"></span>
+        </p>
+
+    </div>
+
+<div id="opqrstContainer" class="hidden">
+    <!-- ========================= -->
+    <!-- O - ONSET -->
+    <!-- ========================= -->
+
+    <div class="section">
+
+        <h2>O — Onset</h2>
+
+        <label>
+
+            When did the pain start?
+
+            <select id="onsetDuration">
+
+                <option value="">
+                    Please select
+                </option>
+
+                <option>
+                    Today
+                </option>
+
+                <option>
+                    Several days ago
+                </option>
+
+                <option>
+                    Several weeks ago
+                </option>
+
+                <option>
+                    Several months ago
+                </option>
+
+                <option>
+                    Several years ago
+                </option>
+
+                <option>
+                    Unknown
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <label>
+
+            How did the pain begin?
+
+            <select id="onsetType">
+
+                <option value="">
+                    Please select
+                </option>
+
+                <option>
+                    Sudden
+                </option>
+
+                <option>
+                    Gradual
+                </option>
+
+                <option>
+                    Insidious
+                </option>
+
+                <option>
+                    Recurrent
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <p>
+            Was there anything associated with the onset?
+        </p>
+
+
+        <div class="options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Injury / trauma">
+                Injury / trauma
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Heavy lifting">
+                Heavy lifting
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Exercise">
+                Exercise
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Surgery">
+                Surgery
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Illness / infection">
+                Illness / infection
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Pregnancy / childbirth">
+                Pregnancy / childbirth
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="Emotional stress">
+                Emotional stress
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="onsetCause"
+                    value="No obvious cause">
+                No obvious cause
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- P - PROVOCATION -->
+    <!-- ========================= -->
+
+    <div class="section">
+
+        <h2>P — Provocation / Palliation</h2>
+
+
+        <p>
+            <strong>
+                What makes the pain worse?
+            </strong>
+        </p>
+
+
+        <div class="options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Movement">
+                Movement
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Rest">
+                Rest
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Walking">
+                Walking
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Standing">
+                Standing
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Sitting">
+                Sitting
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Bending">
+                Bending
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Lifting">
+                Lifting
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Coughing">
+                Coughing
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Deep breathing">
+                Deep breathing
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Stress / emotions">
+                Stress / emotions
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Cold">
+                Cold
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Heat">
+                Heat
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Morning">
+                Morning
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="worse"
+                    value="Night">
+                Night
+            </label>
+
+        </div>
+
+
+        <p>
+            <strong>
+                What makes the pain better?
+            </strong>
+        </p>
+
+
+        <div class="options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Rest">
+                Rest
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Movement">
+                Movement
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Pressure">
+                Pressure
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Massage">
+                Massage
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Heat">
+                Heat
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Cold">
+                Cold
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Stretching">
+                Stretching
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Medication">
+                Medication
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="better"
+                    value="Eating">
+                Eating
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Q - QUALITY -->
+    <!-- ========================= -->
+
+    <div class="section">
+
+        <h2>Q — Quality</h2>
+
+        <p>
+            How would you describe the pain?
+        </p>
+
+
+        <div class="options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Dull / aching">
+                Dull / aching
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Distending">
+                Distending
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Stabbing">
+                Stabbing
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Sharp">
+                Sharp
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Burning">
+                Burning
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Cold / freezing">
+                Cold / freezing
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Heavy">
+                Heavy
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Cramping">
+                Cramping
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Throbbing">
+                Throbbing
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Pulling">
+                Pulling
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Numb">
+                Numb
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Tingling">
+                Tingling
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Electric / shooting">
+                Electric / shooting
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="quality"
+                    value="Pressure">
+                Pressure
+            </label>
+
+        </div>
+
+
+        <label>
+
+            Other description:
+
+            <textarea
+                id="qualityOther"
+                rows="3">
+            </textarea>
+
+        </label>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- R - REGION -->
+    <!-- ========================= -->
+
+    <div class="section">
+
+        <h2>R — Region / Radiation</h2>
+
+
+        <label>
+
+            Where exactly is the pain?
+
+            <input
+                type="text"
+                id="painLocation"
+                placeholder="e.g. lower back, right shoulder...">
+
+        </label>
+
+
+        <p>
+            Does the pain radiate?
+        </p>
+
+
+        <label>
+
+            <input
+                type="radio"
+                name="radiation"
+                value="No"
+                onclick="toggleRadiation(false)">
+
+            No
+
+        </label>
+
+
+        <label>
+
+            <input
+                type="radio"
+                name="radiation"
+                value="Yes"
+                onclick="toggleRadiation(true)">
+
+            Yes
+
+        </label>
+
+
+        <div
+            id="radiationDetails"
+            class="hidden">
+
+            <label>
+
+                Where does the pain radiate?
+
+                <input
+                    type="text"
+                    id="radiationLocation"
+                    placeholder="e.g. right buttock and posterior thigh...">
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- S - SEVERITY -->
+    <!-- ========================= -->
+
+    <div class="section">
+
+        <h2>S — Severity</h2>
+
+
+        <label>
+
+            Current pain:
+
+            <input
+                type="range"
+                id="currentPain"
+                min="0"
+                max="10"
+                value="0"
+                oninput="updatePainValue('currentPain', 'currentPainValue')">
+
+            <div class="pain-number">
+                <span id="currentPainValue">0</span> / 10
+            </div>
+
+        </label>
+
+
+        <label>
+
+            Best pain:
+
+            <input
+                type="range"
+                id="bestPain"
+                min="0"
+                max="10"
+                value="0"
+                oninput="updatePainValue('bestPain', 'bestPainValue')">
+
+            <div class="pain-number">
+                <span id="bestPainValue">0</span> / 10
+            </div>
+
+        </label>
+
+
+        <label>
+
+            Worst pain:
+
+            <input
+                type="range"
+                id="worstPain"
+                min="0"
+                max="10"
+                value="0"
+                oninput="updatePainValue('worstPain', 'worstPainValue')">
+
+            <div class="pain-number">
+                <span id="worstPainValue">0</span> / 10
+            </div>
+
+        </label>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- T - TIMING -->
+    <!-- ========================= -->
+
+    <div class="section">
+
+        <h2>T — Timing</h2>
+
+
+        <p>
+            Is the pain constant or intermittent?
+        </p>
+
+
+        <label>
+
+            <input
+                type="radio"
+                name="painPattern"
+                value="Constant"
+                onclick="toggleTiming(false)">
+
+            Constant
+
+        </label>
+
+
+        <label>
+
+            <input
+                type="radio"
+                name="painPattern"
+                value="Intermittent"
+                onclick="toggleTiming(true)">
+
+            Intermittent
+
+        </label>
+
+
+        <label>
+
+            <input
+                type="radio"
+                name="painPattern"
+                value="Episodic"
+                onclick="toggleTiming(true)">
+
+            Episodic
+
+        </label>
+
+
+        <label>
+
+            <input
+                type="radio"
+                name="painPattern"
+                value="Comes and goes"
+                onclick="toggleTiming(true)">
+
+            Comes and goes
+
+        </label>
+
+
+        <div
+            id="timingDetails"
+            class="hidden">
+
+
+            <label>
+
+                How long does each episode last?
+
+                <input
+                    type="text"
+                    id="episodeDuration"
+                    placeholder="e.g. 20 minutes">
+
+            </label>
+
+
+            <label>
+
+                How often does it occur?
+
+                <input
+                    type="text"
+                    id="episodeFrequency"
+                    placeholder="e.g. 3 times per day">
+
+            </label>
+
+        </div>
+
+
+        <p>
+            <strong>
+                When is the pain worse?
+            </strong>
+        </p>
+
+
+        <div class="options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="Morning">
+                Morning
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="Afternoon">
+                Afternoon
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="Evening">
+                Evening
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="Night">
+                Night
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="During sleep">
+                During sleep
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="After waking">
+                After waking
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    class="timingWorse"
+                    value="No specific pattern">
+                No specific pattern
+            </label>
+
+        </div>
+
+
+        <p>
+            <strong>
+                How has the pain changed since it began?
+            </strong>
+        </p>
+
+
+        <select id="painDevelopment">
+
+            <option value="">
+                Please select
+            </option>
+
+            <option>
+                Improving
+            </option>
+
+            <option>
+                Worsening
+            </option>
+
+            <option>
+                Stable
+            </option>
+
+            <option>
+                Fluctuating
+            </option>
+
+            <option>
+                Recurrent
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- NAVIGATION -->
+    <!-- ========================= -->
+</div>
+
+    <div class="navigation">
+
+        <button onclick="saveAndContinue()">
+            Next →
+        </button>
+
+    </div>
+
+
+    <script>
+function startPainAssessment() {
+
+    document
+        .getElementById("opqrstContainer")
+        .classList.remove("hidden");
+
+}
+
+function skipPainAssessment() {
+
+    const painAssessment = {
+
+        applicable: false,
+
+        reason: "Chief complaint is not pain-related"
+
+    };
+
+    localStorage.setItem(
+        "painAssessment",
+        JSON.stringify(painAssessment)
+    );
+
+    window.location.href =
+        "associated.html";
+
+}
+
+        // =========================
+        // Load patient information
+        // =========================
+
+        const patient =
+            JSON.parse(
+                localStorage.getItem("patient")
+            );
+
+
+        if (patient) {
+
+            document.getElementById(
+                "patientName"
+            ).textContent =
+                patient.firstName;
+
+
+            document.getElementById(
+                "patientAge"
+            ).textContent =
+                patient.age;
+
+
+            document.getElementById(
+                "patientSex"
+            ).textContent =
+                patient.sex;
+
+
+            document.getElementById(
+                "patientComplaint"
+            ).textContent =
+                patient.chiefComplaint;
+
+        }
+
+
+        // =========================
+        // Radiation
+        // =========================
+
+        function toggleRadiation(show) {
+
+            const details =
+                document.getElementById(
+                    "radiationDetails"
+                );
+
+
+            if (show) {
+
+                details.classList.remove(
+                    "hidden"
+                );
+
+            } else {
+
+                details.classList.add(
+                    "hidden"
+                );
+
+                document.getElementById(
+                    "radiationLocation"
+                ).value = "";
+
+            }
+
+        }
+
+
+        // =========================
+        // Timing
+        // =========================
+
+        function toggleTiming(show) {
+
+            const details =
+                document.getElementById(
+                    "timingDetails"
+                );
+
+
+            if (show) {
+
+                details.classList.remove(
+                    "hidden"
+                );
+
+            } else {
+
+                details.classList.add(
+                    "hidden"
+                );
+
+                document.getElementById(
+                    "episodeDuration"
+                ).value = "";
+
+                document.getElementById(
+                    "episodeFrequency"
+                ).value = "";
+
+            }
+
+        }
+
+
+        // =========================
+        // Pain scale
+        // =========================
+
+        function updatePainValue(
+            sliderId,
+            valueId
+        ) {
+
+            const slider =
+                document.getElementById(
+                    sliderId
+                );
+
+
+            const output =
+                document.getElementById(
+                    valueId
+                );
+
+
+            output.textContent =
+                slider.value;
+
+        }
+
+
+        // =========================
+        // Get checkbox values
+        // =========================
+
+        function getCheckedValues(
+            className
+        ) {
+
+            const checked =
+                document.querySelectorAll(
+                    "." + className + ":checked"
+                );
+
+
+            return Array
+                .from(checked)
+                .map(
+                    checkbox =>
+                        checkbox.value
+                );
+
+        }
+
+
+        // =========================
+        // Save complete OPQRST
+        // =========================
+
+        function saveAndContinue() {
+
+
+            const radiation =
+                document.querySelector(
+                    'input[name="radiation"]:checked'
+                );
+
+
+            const painPattern =
+                document.querySelector(
+                    'input[name="painPattern"]:checked'
+                );
+
+
+            const painAssessment = {
+
+
+                O: {
+
+                    duration:
+                        document.getElementById(
+                            "onsetDuration"
+                        ).value,
+
+                    onsetType:
+                        document.getElementById(
+                            "onsetType"
+                        ).value,
+
+                    associatedCause:
+                        getCheckedValues(
+                            "onsetCause"
+                        )
+
+                },
+
+
+                P: {
+
+                    worse:
+                        getCheckedValues(
+                            "worse"
+                        ),
+
+                    better:
+                        getCheckedValues(
+                            "better"
+                        )
+
+                },
+
+
+                Q: {
+
+                    quality:
+                        getCheckedValues(
+                            "quality"
+                        ),
+
+                    other:
+                        document.getElementById(
+                            "qualityOther"
+                        ).value
+
+                },
+
+
+                R: {
+
+                    location:
+                        document.getElementById(
+                            "painLocation"
+                        ).value,
+
+                    radiation:
+                        radiation
+                            ? radiation.value
+                            : "",
+
+                    radiationLocation:
+                        document.getElementById(
+                            "radiationLocation"
+                        ).value
+
+                },
+
+
+                S: {
+
+                    current:
+                        document.getElementById(
+                            "currentPain"
+                        ).value,
+
+                    best:
+                        document.getElementById(
+                            "bestPain"
+                        ).value,
+
+                    worst:
+                        document.getElementById(
+                            "worstPain"
+                        ).value
+
+                },
+
+
+                T: {
+
+                    pattern:
+                        painPattern
+                            ? painPattern.value
+                            : "",
+
+                    episodeDuration:
+                        document.getElementById(
+                            "episodeDuration"
+                        ).value,
+
+                    episodeFrequency:
+                        document.getElementById(
+                            "episodeFrequency"
+                        ).value,
+
+                    worseTime:
+                        getCheckedValues(
+                            "timingWorse"
+                        ),
+
+                    development:
+                        document.getElementById(
+                            "painDevelopment"
+                        ).value
+
+                }
+
+            };
+
+
+            // Save complete OPQRST
+
+            localStorage.setItem(
+                "painAssessment",
+                JSON.stringify(
+                    painAssessment
+                )
+            );
+
+
+            // Go to next page
+
+            window.location.href =
+                "associated.html";
+
+        }
+
+    </script>
+
+</body>
+
+</html>
