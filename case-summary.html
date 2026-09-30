@@ -145,6 +145,21 @@
 
 
 <body>
+    <button
+    type="button"
+    onclick="clearCurrentCase()"
+    style="
+        background-color: #c62828;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    "
+>
+    New Patient / Clear Case
+</button>
 
     <h1>TCM Clinical Assistant</h1>
 
@@ -204,7 +219,20 @@
 
 
 <script>
+function clearCurrentCase() {
 
+    const confirmed = confirm(
+        "Start a new patient?\n\nAll information from the current case will be cleared."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    localStorage.clear();
+
+    window.location.href = "index.html";
+}
 
 /* =========================================================
    BASIC DATA FUNCTIONS
@@ -1787,7 +1815,6 @@ function buildMenstruationSection(
    TONGUE
    ========================================================= */
 
-
 function buildTongueSection(
     container,
     data
@@ -1802,44 +1829,114 @@ function buildTongueSection(
 
 
     if (!data) {
-
         return;
-
     }
+
+
+    /* =========================================
+       TONGUE BODY
+       ========================================= */
+
+    const bodyFields = [
+
+        {
+            label: "Body Colour",
+            value: data.bodyColour
+        },
+
+        {
+            label: "Body Shape",
+            value: data.bodyShape
+        }
+
+    ];
+
+
+    /*
+        Show swelling location only when
+        Swollen has been selected.
+    */
+
+    if (
+        Array.isArray(data.bodyShape) &&
+        data.bodyShape.includes("Swollen")
+    ) {
+
+        bodyFields.push({
+            label: "Swelling Location",
+            value: data.swollenLocation
+        });
+    }
+
+
+    bodyFields.push({
+
+        label: "Body Signs",
+        value: data.bodySigns
+
+    });
+
+
+    /*
+        Show crack locations only when
+        Cracks has been selected.
+    */
+
+    if (
+        Array.isArray(data.bodySigns) &&
+        data.bodySigns.includes("Cracks")
+    ) {
+
+        bodyFields.push({
+            label: "Crack Location",
+            value: data.crackLocations
+        });
+    }
+
+
+    /*
+        Show red spot locations only when
+        Red spots has been selected.
+    */
+
+    if (
+        Array.isArray(data.bodySigns) &&
+        data.bodySigns.includes("Red spots")
+    ) {
+
+        bodyFields.push({
+            label: "Red Spots Location",
+            value: data.redSpotsLocations
+        });
+    }
+
+
+    bodyFields.push({
+
+        label: "Sublingual Veins",
+        value: data.sublingualVeins
+
+    });
+
+
+    bodyFields.push({
+
+        label: "Tongue Body Notes",
+        value: data.bodyNotes
+
+    });
 
 
     addSubsection(
         section,
         "Tongue Body",
-        [
-
-            {
-                label: "Body Colour",
-                value:
-                    data.bodyColour
-            },
-
-            {
-                label: "Body Shape",
-                value:
-                    data.bodyShape
-            },
-
-            {
-                label: "Body Signs",
-                value:
-                    data.bodySigns
-            },
-
-            {
-                label: "Sublingual Veins",
-                value:
-                    data.sublingualVeins
-            }
-
-        ]
+        bodyFields
     );
 
+
+    /* =========================================
+       TONGUE COATING
+       ========================================= */
 
     addSubsection(
         section,
@@ -1848,169 +1945,29 @@ function buildTongueSection(
 
             {
                 label: "Coating Colour",
-                value:
-                    data.coatingColour
+                value: data.coatingColour
             },
 
             {
                 label: "Coating Thickness",
-                value:
-                    data.coatingThickness
+                value: data.coatingThickness
+            },
+
+            {
+                label: "Coating Quality / Distribution",
+                value: data.coatingQuality
+            },
+
+            {
+                label: "Tongue Coating Notes",
+                value: data.coatingNotes
             }
 
         ]
     );
 
-
-    /* ---------- Regional observations ---------- */
-
-
-    const bodyRegions =
-        data.bodyRegions;
-
-
-    const coatingRegions =
-        data.coatingRegions;
-
-
-    if (
-        bodyRegions ||
-        coatingRegions
-    ) {
-
-        const rows = [];
-
-        const regionNames = [
-            "Tip",
-            "Anterior",
-            "Centre",
-            "Root",
-            "Sides"
-        ];
-
-
-        regionNames.forEach(region => {
-
-            const bodyValue =
-                bodyRegions?.[region.toLowerCase()];
-
-
-            const coatingValue =
-                coatingRegions?.[region.toLowerCase()];
-
-
-            if (
-                !isEmptyValue(bodyValue) ||
-                !isEmptyValue(coatingValue)
-            ) {
-
-                rows.push({
-                    region: region,
-                    body: bodyValue,
-                    coating: coatingValue
-                });
-
-            }
-
-        });
-
-
-        if (rows.length > 0) {
-
-            const subsection =
-                document.createElement("div");
-
-            subsection.className =
-                "subsection";
-
-
-            const heading =
-                document.createElement("h3");
-
-            heading.textContent =
-                "Regional Findings";
-
-
-            subsection.appendChild(heading);
-
-
-            const table =
-                document.createElement("table");
-
-            table.className =
-                "pulse-table";
-
-
-            const header =
-                document.createElement("tr");
-
-
-            [
-                "Region",
-                "Tongue Body",
-                "Coating"
-            ].forEach(text => {
-
-                const th =
-                    document.createElement("th");
-
-                th.textContent =
-                    text;
-
-                header.appendChild(th);
-
-            });
-
-
-            table.appendChild(header);
-
-
-            rows.forEach(row => {
-
-                const tr =
-                    document.createElement("tr");
-
-
-                const regionCell =
-                    document.createElement("td");
-
-                regionCell.textContent =
-                    row.region;
-
-
-                const bodyCell =
-                    document.createElement("td");
-
-                bodyCell.textContent =
-                    formatValue(row.body);
-
-
-                const coatingCell =
-                    document.createElement("td");
-
-                coatingCell.textContent =
-                    formatValue(row.coating);
-
-
-                tr.appendChild(regionCell);
-                tr.appendChild(bodyCell);
-                tr.appendChild(coatingCell);
-
-
-                table.appendChild(tr);
-
-            });
-
-
-            subsection.appendChild(table);
-
-            section.appendChild(subsection);
-
-        }
-
-    }
-
 }
+
 
 
 /* =========================================================

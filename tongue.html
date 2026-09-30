@@ -1,171 +1,1195 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>TCM Clinical Assistant - Tongue Inspection</title>
+
     <style>
-        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-        .patient-summary { background: #f3f3f3; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-        .section { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-        .section h2 { margin-top: 0; }
-        label { display: block; margin: 8px 0; }
-        input[type="checkbox"] { width: auto; margin-right: 6px; }
-        textarea { width: 100%; max-width: 650px; box-sizing: border-box; padding: 8px; margin-top: 5px; font: inherit; }
-        .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 3px 16px; }
-        button { padding: 12px 24px; font-size: 16px; cursor: pointer; }
-        .navigation { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
-        .region-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
-        .region-grid textarea { min-height: 90px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .patient-summary {
+            background: #f3f3f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin: 8px 0;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: auto;
+            margin-right: 6px;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 650px;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-top: 5px;
+            font: inherit;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(190px, 1fr)
+            );
+            gap: 3px 16px;
+        }
+
+        .follow-up {
+            margin-top: 15px;
+            margin-left: 20px;
+            padding: 15px;
+            background: #f7f7f7;
+            border-left: 4px solid #999;
+            border-radius: 4px;
+        }
+
+        .follow-up-title {
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 30px;
+        }
     </style>
 </head>
+
 <body>
+
+    <button
+        type="button"
+        onclick="clearCurrentCase()"
+        style="
+            background-color: #c62828;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        "
+    >
+        New Patient / Clear Case
+    </button>
+
+
     <h1>TCM Clinical Assistant</h1>
+
+
     <div class="patient-summary">
+
         <h2>Patient Information</h2>
-        <p><strong>Patient:</strong> <span id="patientName"></span></p>
-        <p><strong>Age:</strong> <span id="patientAge"></span></p>
-        <p><strong>Sex:</strong> <span id="patientSex"></span></p>
-        <p><strong>Chief Complaint:</strong> <span id="patientComplaint"></span></p>
+
+        <p>
+            <strong>Patient:</strong>
+            <span id="patientName"></span>
+        </p>
+
+        <p>
+            <strong>Age:</strong>
+            <span id="patientAge"></span>
+        </p>
+
+        <p>
+            <strong>Sex:</strong>
+            <span id="patientSex"></span>
+        </p>
+
+        <p>
+            <strong>Chief Complaint:</strong>
+            <span id="patientComplaint"></span>
+        </p>
+
     </div>
+
 
     <h2>Tongue Inspection</h2>
+
     <p>School template section 1.9</p>
 
+
+    <!-- ========================= -->
+    <!-- TONGUE BODY -->
+    <!-- ========================= -->
+
     <div class="section">
+
         <h2>Tongue Body</h2>
-        <p><strong>Body colour</strong></p>
-        <div class="options" id="bodyColour">
-            <label><input type="checkbox" value="Pale"> Pale</label><label><input type="checkbox" value="Pink"> Pink</label>
-            <label><input type="checkbox" value="Red"> Red</label><label><input type="checkbox" value="Crimson"> Crimson</label>
-            <label><input type="checkbox" value="Purple"> Purple</label><label><input type="checkbox" value="Bluish purple"> Bluish purple</label>
-        </div>
-        <p><strong>Body shape</strong></p>
-        <div class="options" id="bodyShape">
-            <label><input type="checkbox" value="Normal"> Normal</label><label><input type="checkbox" value="Swollen"> Swollen</label>
-            <label><input type="checkbox" value="Thin"> Thin</label><label><input type="checkbox" value="Long"> Long</label>
-            <label><input type="checkbox" value="Short"> Short</label><label><input type="checkbox" value="Stiff"> Stiff</label>
-            <label><input type="checkbox" value="Deviated"> Deviated</label><label><input type="checkbox" value="Trembling"> Trembling</label>
-        </div>
-        <p><strong>Additional signs</strong></p>
-        <div class="options" id="bodySigns">
-            <label><input type="checkbox" value="Teeth marks"> Teeth marks</label><label><input type="checkbox" value="Cracks"> Cracks</label>
-            <label><input type="checkbox" value="Red spots"> Red spots</label><label><input type="checkbox" value="Dry"> Dry</label>
-            <label><input type="checkbox" value="Moist"> Moist</label><label><input type="checkbox" value="Wet"> Wet</label>
-        </div>
-        <p><strong>Sublingual veins</strong></p>
-        <div class="options" id="sublingualVeins">
-            <label><input type="checkbox" value="Normal"> Normal</label><label><input type="checkbox" value="Dark"> Dark</label>
-            <label><input type="checkbox" value="Distended"> Distended</label><label><input type="checkbox" value="Tortuous"> Tortuous</label>
-        </div>
-        <label for="bodyNotes">Tongue body notes</label>
-        <textarea id="bodyNotes" rows="3" placeholder="Record any other relevant observation."></textarea>
 
-        <h3>Tongue Body: Regional Observations</h3>
-        <div class="region-grid">
-            <label for="bodyTip">Tongue tip — Heart
-                <textarea id="bodyTip" placeholder="Colour, spots, cracks, or other changes."></textarea>
+
+        <!-- Body Colour -->
+
+        <p>
+            <strong>Body colour</strong>
+        </p>
+
+        <div
+            class="options"
+            id="bodyColour"
+        >
+            <label>
+                <input
+                    type="checkbox"
+                    value="Pale"
+                >
+                Pale
             </label>
-            <label for="bodyAnterior">Anterior tongue — Upper Jiao
-                <textarea id="bodyAnterior" placeholder="Relevant observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Pink"
+                >
+                Pink
             </label>
-            <label for="bodyCentre">Centre of tongue — Middle Jiao
-                <textarea id="bodyCentre" placeholder="Relevant observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Red"
+                >
+                Red
             </label>
-            <label for="bodyRoot">Tongue root — Lower Jiao
-                <textarea id="bodyRoot" placeholder="Relevant observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Crimson"
+                >
+                Crimson
             </label>
-            <label for="bodySides">Tongue sides — Liver / Gallbladder
-                <textarea id="bodySides" placeholder="Relevant observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Purple"
+                >
+                Purple
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Bluish purple"
+                >
+                Bluish purple
             </label>
         </div>
+
+
+        <!-- Body Shape -->
+
+        <p>
+            <strong>Body shape</strong>
+        </p>
+
+        <div
+            class="options"
+            id="bodyShape"
+        >
+            <label>
+                <input
+                    type="checkbox"
+                    value="Normal"
+                >
+                Normal
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Swollen"
+                    onchange="updateTongueFollowUps()"
+                >
+                Swollen
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Thin"
+                >
+                Thin
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Long"
+                >
+                Long
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Short"
+                >
+                Short
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Stiff"
+                >
+                Stiff
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Deviated"
+                >
+                Deviated
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Trembling"
+                >
+                Trembling
+            </label>
+        </div>
+
+
+        <!-- Swollen Location -->
+
+        <div
+            id="swollenLocationSection"
+            class="follow-up hidden"
+        >
+
+            <p class="follow-up-title">
+                Where is the swelling most noticeable?
+            </p>
+
+            <label>
+                <input
+                    type="radio"
+                    name="swollenLocation"
+                    value="Whole tongue"
+                >
+                Whole tongue
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="swollenLocation"
+                    value="Two sides"
+                >
+                Two sides
+            </label>
+
+        </div>
+
+
+        <!-- Additional Signs -->
+
+        <p>
+            <strong>Additional signs</strong>
+        </p>
+
+        <div
+            class="options"
+            id="bodySigns"
+        >
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Teeth marks"
+                >
+                Teeth marks
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Cracks"
+                    onchange="updateTongueFollowUps()"
+                >
+                Cracks
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Red spots"
+                    onchange="updateTongueFollowUps()"
+                >
+                Red spots
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Dry"
+                >
+                Dry
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Moist"
+                >
+                Moist
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Wet"
+                >
+                Wet
+            </label>
+
+        </div>
+
+
+        <!-- Crack Location -->
+
+        <div
+            id="crackLocationSection"
+            class="follow-up hidden"
+        >
+
+            <p class="follow-up-title">
+                Where are the cracks located?
+            </p>
+
+            <div class="options">
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="crackLocation"
+                        value="Tip"
+                    >
+                    Tip
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="crackLocation"
+                        value="Upper Jiao"
+                    >
+                    Upper Jiao
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="crackLocation"
+                        value="Middle Jiao"
+                    >
+                    Middle Jiao
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="crackLocation"
+                        value="Lower Jiao"
+                    >
+                    Lower Jiao
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="crackLocation"
+                        value="Two sides"
+                    >
+                    Two sides
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- Red Spots Location -->
+
+        <div
+            id="redSpotsLocationSection"
+            class="follow-up hidden"
+        >
+
+            <p class="follow-up-title">
+                Where are the red spots located?
+            </p>
+
+            <div class="options">
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="redSpotsLocation"
+                        value="Tip"
+                    >
+                    Tip
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="redSpotsLocation"
+                        value="Upper Jiao"
+                    >
+                    Upper Jiao
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="redSpotsLocation"
+                        value="Middle Jiao"
+                    >
+                    Middle Jiao
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="redSpotsLocation"
+                        value="Lower Jiao"
+                    >
+                    Lower Jiao
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        class="redSpotsLocation"
+                        value="Two sides"
+                    >
+                    Two sides
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- Sublingual Veins -->
+
+        <p>
+            <strong>Sublingual veins</strong>
+        </p>
+
+        <div
+            class="options"
+            id="sublingualVeins"
+        >
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Normal"
+                >
+                Normal
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Slightly dark"
+                >
+                Slightly dark
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Dark"
+                >
+                Dark
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Distended"
+                >
+                Distended
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Tortuous"
+                >
+                Tortuous
+            </label>
+
+        </div>
+
+
+        <label for="bodyNotes">
+            Tongue body notes
+        </label>
+
+        <textarea
+            id="bodyNotes"
+            rows="3"
+            placeholder="Record any other relevant observation."
+        ></textarea>
+
     </div>
+
+
+    <!-- ========================= -->
+    <!-- TONGUE COATING -->
+    <!-- ========================= -->
 
     <div class="section">
-        <h2>Tongue Coating</h2>
-        <p><strong>Coating colour</strong></p>
-        <div class="options" id="coatingColour">
-            <label><input type="checkbox" value="White"> White</label><label><input type="checkbox" value="Yellow"> Yellow</label>
-            <label><input type="checkbox" value="Gray"> Gray</label><label><input type="checkbox" value="Black"> Black</label>
-        </div>
-        <p><strong>Coating thickness</strong></p>
-        <div class="options" id="coatingThickness">
-            <label><input type="checkbox" value="None"> None</label><label><input type="checkbox" value="Thin"> Thin</label>
-            <label><input type="checkbox" value="Thick"> Thick</label><label><input type="checkbox" value="Peeling"> Peeling</label>
-            <label><input type="checkbox" value="Patchy"> Patchy</label>
-        </div>
-        <p><strong>Coating quality and distribution</strong></p>
-        <div class="options" id="coatingQuality">
-            <label><input type="checkbox" value="Moist"> Moist</label><label><input type="checkbox" value="Dry"> Dry</label>
-            <label><input type="checkbox" value="Greasy"> Greasy</label><label><input type="checkbox" value="Curdy"> Curdy</label>
-            <label><input type="checkbox" value="Rooted"> Rooted</label><label><input type="checkbox" value="Rootless"> Rootless</label>
-            <label><input type="checkbox" value="Central"> Central</label><label><input type="checkbox" value="Sides"> Sides</label>
-            <label><input type="checkbox" value="Tip"> Tip</label><label><input type="checkbox" value="Root"> Root</label>
-        </div>
-        <label for="coatingNotes">Tongue coating notes</label>
-        <textarea id="coatingNotes" rows="3" placeholder="Record any other relevant observation."></textarea>
 
-        <h3>Tongue Coating: Regional Observations</h3>
-        <div class="region-grid">
-            <label for="coatingTip">Tongue tip — Heart
-                <textarea id="coatingTip" placeholder="Coating colour, thickness, moisture, or absence."></textarea>
+        <h2>Tongue Coating</h2>
+
+
+        <!-- Coating Colour -->
+
+        <p>
+            <strong>Coating colour</strong>
+        </p>
+
+        <div
+            class="options"
+            id="coatingColour"
+        >
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="White"
+                >
+                White
             </label>
-            <label for="coatingAnterior">Anterior tongue — Upper Jiao
-                <textarea id="coatingAnterior" placeholder="Relevant coating observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Yellow"
+                >
+                Yellow
             </label>
-            <label for="coatingCentre">Centre of tongue — Middle Jiao
-                <textarea id="coatingCentre" placeholder="Relevant coating observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Gray"
+                >
+                Gray
             </label>
-            <label for="coatingRoot">Tongue root — Lower Jiao
-                <textarea id="coatingRoot" placeholder="Relevant coating observations."></textarea>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Black"
+                >
+                Black
             </label>
-            <label for="coatingSides">Tongue sides — Liver / Gallbladder
-                <textarea id="coatingSides" placeholder="Relevant coating observations."></textarea>
-            </label>
+
         </div>
+
+
+        <!-- Coating Thickness -->
+
+        <p>
+            <strong>Coating thickness</strong>
+        </p>
+
+        <div
+            class="options"
+            id="coatingThickness"
+        >
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="None"
+                >
+                None
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Thin"
+                >
+                Thin
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Thick"
+                >
+                Thick
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Peeling"
+                >
+                Peeling
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Patchy"
+                >
+                Patchy
+            </label>
+
+        </div>
+
+
+        <!-- Coating Quality -->
+
+        <p>
+            <strong>Coating quality and distribution</strong>
+        </p>
+
+        <div
+            class="options"
+            id="coatingQuality"
+        >
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Moist"
+                >
+                Moist
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Dry"
+                >
+                Dry
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Greasy"
+                >
+                Greasy
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Curdy"
+                >
+                Curdy
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Rooted"
+                >
+                Rooted
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Rootless"
+                >
+                Rootless
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Central"
+                >
+                Central
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Sides"
+                >
+                Sides
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Tip"
+                >
+                Tip
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    value="Root"
+                >
+                Root
+            </label>
+
+        </div>
+
+
+        <label for="coatingNotes">
+            Tongue coating notes
+        </label>
+
+        <textarea
+            id="coatingNotes"
+            rows="3"
+            placeholder="Record any other relevant observation."
+        ></textarea>
+
     </div>
+
+
+    <!-- Navigation -->
 
     <div class="navigation">
-        <button type="button" onclick="window.location.href='medical-history.html'">← Back</button>
-        <button type="button" onclick="saveAndContinue()">Save and Continue →</button>
+
+        <button
+            type="button"
+            onclick="window.location.href='medical-history.html'"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            onclick="saveAndContinue()"
+        >
+            Save and Continue →
+        </button>
+
     </div>
 
+
     <script>
-        const patient = JSON.parse(localStorage.getItem("patient"));
-        if (patient) { document.getElementById("patientName").textContent = patient.firstName; document.getElementById("patientAge").textContent = patient.age; document.getElementById("patientSex").textContent = patient.sex; document.getElementById("patientComplaint").textContent = patient.chiefComplaint; }
 
-        const groups = ["bodyColour", "bodyShape", "bodySigns", "sublingualVeins", "coatingColour", "coatingThickness", "coatingQuality"];
-        function checkedValues(id) { return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(item => item.value); }
-        function restoreCheckedValues(id, values) { document.querySelectorAll(`#${id} input`).forEach(item => { item.checked = values.includes(item.value); }); }
+        /* =========================
+           CLEAR CURRENT CASE
+        ========================= */
 
-        const savedTongueInspection = JSON.parse(localStorage.getItem("tongueInspection"));
-        if (savedTongueInspection) {
-            groups.forEach(id => restoreCheckedValues(id, savedTongueInspection[id] || []));
-            document.getElementById("bodyNotes").value = savedTongueInspection.bodyNotes || "";
-            document.getElementById("coatingNotes").value = savedTongueInspection.coatingNotes || "";
-            Object.entries(savedTongueInspection.bodyRegions || {}).forEach(([region, value]) => {
-                document.getElementById(`body${region}`).value = value;
-            });
-            Object.entries(savedTongueInspection.coatingRegions || {}).forEach(([region, value]) => {
-                document.getElementById(`coating${region}`).value = value;
+        function clearCurrentCase() {
+
+            const confirmed = confirm(
+                "Start a new patient?\n\nAll information from the current case will be cleared."
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            localStorage.clear();
+
+            window.location.href = "index.html";
+        }
+
+
+        /* =========================
+           PATIENT INFORMATION
+        ========================= */
+
+        const patient =
+            JSON.parse(
+                localStorage.getItem("patient")
+            );
+
+        if (patient) {
+
+            document.getElementById(
+                "patientName"
+            ).textContent =
+                patient.firstName;
+
+            document.getElementById(
+                "patientAge"
+            ).textContent =
+                patient.age;
+
+            document.getElementById(
+                "patientSex"
+            ).textContent =
+                patient.sex;
+
+            document.getElementById(
+                "patientComplaint"
+            ).textContent =
+                patient.chiefComplaint;
+        }
+
+
+        /* =========================
+           BASIC HELPERS
+        ========================= */
+
+        const groups = [
+            "bodyColour",
+            "bodyShape",
+            "bodySigns",
+            "sublingualVeins",
+            "coatingColour",
+            "coatingThickness",
+            "coatingQuality"
+        ];
+
+
+        function checkedValues(id) {
+
+            return Array.from(
+                document.querySelectorAll(
+                    `#${id} input:checked`
+                )
+            ).map(
+                item => item.value
+            );
+        }
+
+
+        function checkedClassValues(className) {
+
+            return Array.from(
+                document.querySelectorAll(
+                    `.${className}:checked`
+                )
+            ).map(
+                item => item.value
+            );
+        }
+
+
+        function restoreCheckedValues(
+            id,
+            values
+        ) {
+
+            document.querySelectorAll(
+                `#${id} input`
+            ).forEach(item => {
+
+                item.checked =
+                    Array.isArray(values) &&
+                    values.includes(
+                        item.value
+                    );
             });
         }
+
+
+        function restoreClassValues(
+            className,
+            values
+        ) {
+
+            document.querySelectorAll(
+                `.${className}`
+            ).forEach(item => {
+
+                item.checked =
+                    Array.isArray(values) &&
+                    values.includes(
+                        item.value
+                    );
+            });
+        }
+
+
+        function selectedRadioValue(name) {
+
+            const selected =
+                document.querySelector(
+                    `input[name="${name}"]:checked`
+                );
+
+            return selected
+                ? selected.value
+                : "";
+        }
+
+
+        function restoreRadioValue(
+            name,
+            value
+        ) {
+
+            document.querySelectorAll(
+                `input[name="${name}"]`
+            ).forEach(item => {
+
+                item.checked =
+                    item.value === value;
+            });
+        }
+
+
+        /* =========================
+           CONDITIONAL QUESTIONS
+        ========================= */
+
+        function updateTongueFollowUps() {
+
+            const bodyShape =
+                checkedValues(
+                    "bodyShape"
+                );
+
+            const bodySigns =
+                checkedValues(
+                    "bodySigns"
+                );
+
+
+            const swollenSection =
+                document.getElementById(
+                    "swollenLocationSection"
+                );
+
+            const crackSection =
+                document.getElementById(
+                    "crackLocationSection"
+                );
+
+            const redSpotsSection =
+                document.getElementById(
+                    "redSpotsLocationSection"
+                );
+
+
+            swollenSection.classList.toggle(
+                "hidden",
+                !bodyShape.includes(
+                    "Swollen"
+                )
+            );
+
+
+            crackSection.classList.toggle(
+                "hidden",
+                !bodySigns.includes(
+                    "Cracks"
+                )
+            );
+
+
+            redSpotsSection.classList.toggle(
+                "hidden",
+                !bodySigns.includes(
+                    "Red spots"
+                )
+            );
+        }
+
+
+        /* =========================
+           RESTORE SAVED DATA
+        ========================= */
+
+        const savedTongueInspection =
+            JSON.parse(
+                localStorage.getItem(
+                    "tongueInspection"
+                )
+            );
+
+
+        if (savedTongueInspection) {
+
+            groups.forEach(id => {
+
+                restoreCheckedValues(
+                    id,
+                    savedTongueInspection[id]
+                    || []
+                );
+            });
+
+
+            document.getElementById(
+                "bodyNotes"
+            ).value =
+                savedTongueInspection
+                    .bodyNotes || "";
+
+
+            document.getElementById(
+                "coatingNotes"
+            ).value =
+                savedTongueInspection
+                    .coatingNotes || "";
+
+
+            restoreRadioValue(
+                "swollenLocation",
+                savedTongueInspection
+                    .swollenLocation || ""
+            );
+
+
+            restoreClassValues(
+                "crackLocation",
+                savedTongueInspection
+                    .crackLocations || []
+            );
+
+
+            restoreClassValues(
+                "redSpotsLocation",
+                savedTongueInspection
+                    .redSpotsLocations || []
+            );
+
+
+            updateTongueFollowUps();
+        }
+
+
+        /* =========================
+           SAVE AND CONTINUE
+        ========================= */
 
         function saveAndContinue() {
+
             const tongueInspection = {
-                bodyNotes: document.getElementById("bodyNotes").value,
-                coatingNotes: document.getElementById("coatingNotes").value,
-                bodyRegions: {},
-                coatingRegions: {}
+
+                bodyNotes:
+                    document.getElementById(
+                        "bodyNotes"
+                    ).value,
+
+                coatingNotes:
+                    document.getElementById(
+                        "coatingNotes"
+                    ).value,
+
+                swollenLocation:
+                    selectedRadioValue(
+                        "swollenLocation"
+                    ),
+
+                crackLocations:
+                    checkedClassValues(
+                        "crackLocation"
+                    ),
+
+                redSpotsLocations:
+                    checkedClassValues(
+                        "redSpotsLocation"
+                    )
             };
-            groups.forEach(id => { tongueInspection[id] = checkedValues(id); });
-            ["Tip", "Anterior", "Centre", "Root", "Sides"].forEach(region => {
-                tongueInspection.bodyRegions[region] = document.getElementById(`body${region}`).value;
-                tongueInspection.coatingRegions[region] = document.getElementById(`coating${region}`).value;
+
+
+            groups.forEach(id => {
+
+                tongueInspection[id] =
+                    checkedValues(id);
             });
-            localStorage.setItem("tongueInspection", JSON.stringify(tongueInspection));
-            window.location.href = "pulse.html";
+
+
+            /*
+                If a conditional sign is not
+                selected, do not retain its
+                old location information.
+            */
+
+            if (
+                !tongueInspection.bodyShape
+                    .includes("Swollen")
+            ) {
+                tongueInspection
+                    .swollenLocation = "";
+            }
+
+
+            if (
+                !tongueInspection.bodySigns
+                    .includes("Cracks")
+            ) {
+                tongueInspection
+                    .crackLocations = [];
+            }
+
+
+            if (
+                !tongueInspection.bodySigns
+                    .includes("Red spots")
+            ) {
+                tongueInspection
+                    .redSpotsLocations = [];
+            }
+
+
+            localStorage.setItem(
+                "tongueInspection",
+                JSON.stringify(
+                    tongueInspection
+                )
+            );
+
+
+            window.location.href =
+                "pulse.html";
         }
+
     </script>
+
 </body>
 </html>

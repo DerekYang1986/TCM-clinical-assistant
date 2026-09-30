@@ -9,6 +9,21 @@
 <body>
 
     <h1>TCM Clinical Assistant</h1>
+    <button
+    type="button"
+    onclick="clearCurrentCase()"
+    style="
+        background-color: #c62828;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    "
+>
+    New Patient / Clear Case
+</button>
 
     <h2>Patient Information</h2>
 
@@ -44,7 +59,26 @@
  <button onclick="goToHPI()">Next →</button>
 
 <script>
-    function goToHPI() {
+   function clearCurrentCase() {
+
+    const confirmed = confirm(
+        "Start a new patient?\n\nAll information from the current case will be cleared."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    localStorage.clear();
+
+    document.getElementById("firstName").value = "";
+    document.getElementById("age").value = "";
+    document.getElementById("sex").value = "";
+    document.getElementById("chiefComplaint").value = "";
+
+    alert("The previous case has been cleared.");
+}
+   function goToHPI() {
 
         const patient = {
             firstName: document.getElementById("firstName").value,

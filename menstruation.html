@@ -20,6 +20,21 @@
     </style>
 </head>
 <body>
+    <button
+    type="button"
+    onclick="clearCurrentCase()"
+    style="
+        background-color: #c62828;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    "
+>
+    New Patient / Clear Case
+</button>
     <h1>TCM Clinical Assistant</h1>
     <div class="patient-summary">
         <h2>Patient Information</h2>
@@ -158,6 +173,20 @@
     </div>
 
     <script>
+     function clearCurrentCase() {
+
+    const confirmed = confirm(
+        "Start a new patient?\n\nAll information from the current case will be cleared."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    localStorage.clear();
+
+    window.location.href = "index.html";
+}   
         const patient = JSON.parse(localStorage.getItem("patient"));
         if (patient) { document.getElementById("patientName").textContent = patient.firstName; document.getElementById("patientAge").textContent = patient.age; document.getElementById("patientSex").textContent = patient.sex; document.getElementById("patientComplaint").textContent = patient.chiefComplaint; }
 
