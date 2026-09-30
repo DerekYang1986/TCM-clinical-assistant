@@ -170,37 +170,29 @@
 
             When did the pain start?
 
-            <select id="onsetDuration">
+           <div style="display: flex; gap: 10px; align-items: center; max-width: 500px;">
 
-                <option value="">
-                    Please select
-                </option>
+    <input
+        type="number"
+        id="onsetDuration"
+        min="0"
+        step="1"
+        placeholder="Enter number"
+        style="flex: 1;"
+    >
 
-                <option>
-                    Today
-                </option>
+    <select
+        id="onsetDurationUnit"
+        style="width: 160px;"
+    >
+        <option value="">Select unit</option>
+        <option value="Days">Days</option>
+        <option value="Weeks">Weeks</option>
+        <option value="Months">Months</option>
+        <option value="Years">Years</option>
+    </select>
 
-                <option>
-                    Several days ago
-                </option>
-
-                <option>
-                    Several weeks ago
-                </option>
-
-                <option>
-                    Several months ago
-                </option>
-
-                <option>
-                    Several years ago
-                </option>
-
-                <option>
-                    Unknown
-                </option>
-
-            </select>
+</div>
 
         </label>
 
@@ -306,7 +298,21 @@
                     value="No obvious cause">
                 No obvious cause
             </label>
+<label>
+    <input
+        type="checkbox"
+        class="onsetCause"
+        value="Eating / after eating">
+    Eating / after eating
+</label>
 
+<label>
+    <input
+        type="checkbox"
+        class="onsetCause"
+        value="Empty stomach / hunger">
+    Empty stomach / hunger
+</label>
         </div>
 
     </div>
@@ -320,7 +326,132 @@
 
         <h2>P — Provocation / Palliation</h2>
 
+<p>
+    <strong>
+        Is the pain located in the stomach / abdomen?
+    </strong>
+</p>
 
+<label>
+    <input
+        type="radio"
+        name="abdominalPain"
+        value="Yes"
+        onclick="toggleAbdominalPainQuestions(true)"
+    >
+    Yes
+</label>
+
+<label>
+    <input
+        type="radio"
+        name="abdominalPain"
+        value="No"
+        onclick="toggleAbdominalPainQuestions(false)"
+    >
+    No
+</label>
+
+<div
+    id="abdominalPainQuestions"
+    class="hidden"
+>
+
+    <p>
+        <strong>
+            How does pressure affect the pain?
+        </strong>
+    </p>
+
+    <label>
+        <input
+            type="radio"
+            name="pressureEffect"
+            value="Better with pressure"
+        >
+        Better with pressure
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="pressureEffect"
+            value="Worse with pressure"
+        >
+        Worse with pressure
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="pressureEffect"
+            value="No significant change"
+        >
+        No significant change
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="pressureEffect"
+            value="Unknown"
+        >
+        Unknown
+    </label>
+
+
+    <p>
+        <strong>
+            How is the pain related to eating?
+        </strong>
+    </p>
+
+    <label>
+        <input
+            type="radio"
+            name="eatingRelationship"
+            value="Worse before eating / when hungry"
+        >
+        Worse before eating / when hungry
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="eatingRelationship"
+            value="Worse after eating"
+        >
+        Worse after eating
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="eatingRelationship"
+            value="Better after eating"
+        >
+        Better after eating
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="eatingRelationship"
+            value="No clear relationship"
+        >
+        No clear relationship
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="eatingRelationship"
+            value="Unknown"
+        >
+        Unknown
+    </label>
+
+</div>
         <p>
             <strong>
                 What makes the pain worse?
@@ -1118,7 +1249,15 @@ function skipPainAssessment() {
         // =========================
         // Radiation
         // =========================
+function toggleAbdominalPainQuestions(show) {
 
+    document
+        .getElementById("abdominalPainQuestions")
+        .classList.toggle(
+            "hidden",
+            !show
+        );
+}
         function toggleRadiation(show) {
 
             const details =
@@ -1261,9 +1400,13 @@ function skipPainAssessment() {
                 O: {
 
                     duration:
-                        document.getElementById(
-                            "onsetDuration"
-                        ).value,
+    document.getElementById("onsetDuration").value &&
+    document.getElementById("onsetDurationUnit").value
+        ? document.getElementById("onsetDuration").value +
+          " " +
+          document.getElementById("onsetDurationUnit").value +
+          " ago"
+        : "",
 
                     onsetType:
                         document.getElementById(
@@ -1278,20 +1421,26 @@ function skipPainAssessment() {
                 },
 
 
-                P: {
+               P: {
+    worse: getCheckedValues("worse"),
 
-                    worse:
-                        getCheckedValues(
-                            "worse"
-                        ),
+    better: getCheckedValues("better"),
 
-                    better:
-                        getCheckedValues(
-                            "better"
-                        )
+    abdominalPain:
+        document.querySelector(
+            'input[name="abdominalPain"]:checked'
+        )?.value || "",
 
-                },
+    pressureEffect:
+        document.querySelector(
+            'input[name="pressureEffect"]:checked'
+        )?.value || "",
 
+    eatingRelationship:
+        document.querySelector(
+            'input[name="eatingRelationship"]:checked'
+        )?.value || ""
+},
 
                 Q: {
 

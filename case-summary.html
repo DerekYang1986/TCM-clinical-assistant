@@ -676,24 +676,45 @@ function buildHPISection(
        ===================================================== */
 
     addSubsection(
-        section,
-        "P — Provocation / Palliation",
-        [
-            {
-                label: "Worse With",
-                value:
-                    painAssessment.P &&
-                    painAssessment.P.worse
-            },
+    section,
+    "P — Provocation / Palliation",
+    [
+        {
+            label: "Worse With",
+            value:
+                painAssessment.P &&
+                painAssessment.P.worse
+        },
 
-            {
-                label: "Better With",
-                value:
-                    painAssessment.P &&
-                    painAssessment.P.better
-            }
-        ]
-    );
+        {
+            label: "Better With",
+            value:
+                painAssessment.P &&
+                painAssessment.P.better
+        },
+
+        {
+            label: "Stomach / Abdominal Pain",
+            value:
+                painAssessment.P &&
+                painAssessment.P.abdominalPain
+        },
+
+        {
+            label: "Effect of Pressure",
+            value:
+                painAssessment.P &&
+                painAssessment.P.pressureEffect
+        },
+
+        {
+            label: "Relationship to Eating",
+            value:
+                painAssessment.P &&
+                painAssessment.P.eatingRelationship
+        }
+    ]
+);
 
 
     /* =====================================================
@@ -2868,6 +2889,20 @@ if (painAssessment.P?.better) {
     factorParts.push(
         "Better with: " +
         painAssessment.P.better
+    );
+}
+
+if (painAssessment.P?.pressureEffect) {
+    factorParts.push(
+        "Pressure: " +
+        painAssessment.P.pressureEffect
+    );
+}
+
+if (painAssessment.P?.eatingRelationship) {
+    factorParts.push(
+        "Eating: " +
+        painAssessment.P.eatingRelationship
     );
 }
 
